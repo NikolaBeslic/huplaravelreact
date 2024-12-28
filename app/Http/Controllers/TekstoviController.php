@@ -44,7 +44,7 @@ class TekstoviController extends Controller
     public function search(Request $request)
     {
         $inputSearch = $request['inputSearch'];
-        $result = Tekst::whereRaw("MATCH(naslov, sadrzaj) AGAINST(? IN BOOLEAN MODE)", [$inputSearch])->get();
+        $result = Tekst::whereRaw("MATCH(naslov, sadrzaj) AGAINST(? IN BOOLEAN MODE)", [$inputSearch])->with('kategorija')->get();
         return json_encode($result);
     }
 
