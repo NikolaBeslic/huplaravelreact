@@ -274,11 +274,12 @@ class TekstoviController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'kategorijaid',
             'naslov' => 'required',
             'slug' => 'required|unique:tekst',
             'uvod' => 'required|max:280 ',
             'sadrzaj' => 'required',
-            'thumbnail' => 'required'
+            //'thumbnail' => 'required'
         ]);
 
         $tekst = new Tekst();
@@ -524,5 +525,11 @@ class TekstoviController extends Controller
     {
         $hupikons = Tekst::where('kategorijaid', 5)->where('is_published', 1)->with('hupikon')->orderBy('published_at', 'desc')->get();
         return json_encode($hupikons);
+    }
+
+    public function adminGetTekstoviZaNaslovnu()
+    {
+        $tekstovi = Tekst::with('kategorija')->orderBy('created_at', 'desc')->take(10)->get();
+        return json_encode($tekstovi);
     }
 }

@@ -7,8 +7,7 @@ use App\Models\Grad;
 use Illuminate\Http\Request;
 use App\Models\Predstava;
 use App\Models\Zanr;
-use Illuminate\Support\Facades\Date;
-use PhpParser\Node\Expr\Cast\Object_;
+use Dotenv\Exception\ValidationException;
 use stdClass;
 
 class PredstaveController extends Controller
@@ -123,6 +122,61 @@ class PredstaveController extends Controller
             //->orderBy('tekst.created_at', 'desc')
             ->take(10)
             ->get();
+        return json_encode($predstave);
+    }
+
+    public function getAllPredstaveAdmin()
+    {
+        return json_encode(Predstava::with('pozorista')->get());
+    }
+
+    public function getSinglePredstavaById($predstavaid)
+    {
+        $predstava = Predstava::where('predstavaid', $predstavaid)->with('pozorista')->firstOrFail();
+        return json_encode($predstava);
+    }
+
+    public function store(Request $request)
+    {
+        try {
+            $request->validate([
+                'naziv_predstave' => 'required',
+                'predstava_slug' => 'required|unique:predstava'
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json($e, 422);
+        }
+
+        $predstava = new Predstava($request->all());
+        if ($predstava->save()) {
+            $predstava->pozorista()->attach($request->pozorista);
+            return response()->json([], 200);
+        }
+    }
+
+    public function update(Request $request)
+    {
+        $predstava = Predstava::where('predstavaid', $request->predstavaid)->firstOrFail();
+
+        try {
+            $request->validate([
+                'naziv_predstave' => 'required',
+                'predstava_slug' => 'required'
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json($e, 422);
+        }
+
+        $predstava->fill($request->all());
+        if ($predstava->save()) {
+            $predstava->pozorista()->sync($request->pozorista);
+            return response()->json([], 200);
+        }
+    }
+
+    public function adminGetPredstaveZaNaslovnu()
+    {
+        $predstave = Predstava::with('pozorista')->orderBy('created_at', 'desc')->take(10)->get();
         return json_encode($predstave);
     }
 }

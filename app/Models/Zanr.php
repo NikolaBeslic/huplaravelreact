@@ -9,6 +9,7 @@ class Zanr extends Model
     //
     protected $table = 'zanr';
     protected $primaryKey = 'zanrid';
+    protected $guarded = [];
 
     public function predstave()
     {

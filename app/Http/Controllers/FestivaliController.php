@@ -25,4 +25,10 @@ class FestivaliController extends Controller
             ->firstOrFail();
         return json_encode($festival);
     }
+
+    public function adminGetFestivaliZaNaslovnu()
+    {
+        $festivali = Festival::with('grad')->orderBy('created_at', 'desc')->take(7)->get();
+        return json_encode($festivali);
+    }
 }

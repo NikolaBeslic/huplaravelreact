@@ -7,6 +7,7 @@ use App\Http\Resources\PozoristeResource;
 use App\Igranje;
 use Illuminate\Http\Request;
 use App\Models\Pozoriste;
+use Dotenv\Exception\ValidationException;
 
 class PozoristaController extends Controller
 {
@@ -40,5 +41,48 @@ class PozoristaController extends Controller
         //return IgranjeResource::collection($pozoriste->igranja);
         //return PozoristeResource::make($pozoriste);
 
+    }
+
+    public function getSinglePozoristeAdmin($pozoristeid)
+    {
+        $pozoriste = Pozoriste::where('pozoristeid', $pozoristeid)->firstOrFail();
+        return json_encode($pozoriste);
+    }
+
+    public function update(Request $request)
+    {
+        $pozoriste = Pozoriste::where('pozoristeid', $request->pozoristeid)->firstOrFail();
+        try {
+            $request->validate([
+                'naziv_pozorista' => 'required',
+                'pozoriste_slug' => 'required',
+                'gradid' => 'required',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json($e, 422);
+        }
+        $pozoriste->fill($request->all());
+
+        if ($pozoriste->save()) {
+            return response()->json([], 200);
+        }
+    }
+
+    public function store(Request $request)
+    {
+        try {
+            $request->validate([
+                'naziv_pozorista' => 'required',
+                'pozoriste_slug' => 'required|unique:pozoriste,pozoriste_slug',
+                'gradid' => 'required',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json($e, 422);
+        }
+        $pozoriste = new Pozoriste($request->all());
+
+        if ($pozoriste->save()) {
+            return response()->json([], 200);
+        }
     }
 }

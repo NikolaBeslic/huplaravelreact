@@ -12,6 +12,7 @@ use App\Http\Controllers\RepertoariController;
 use App\Http\Controllers\FestivaliController;
 use App\Http\Controllers\KategorijeController;
 use App\Http\Controllers\TagoviController;
+use App\Http\Controllers\ZanroviController;
 
 /*
 |--------------------------------------------------------------------------
@@ -61,11 +62,49 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::post('/adminlogin', [AdminAuthController::class, 'login']);
+/* Admin naslovna */
+Route::get('/admin/tekstovi-za-naslovnu', [TekstoviController::class, 'adminGetTekstoviZaNaslovnu']);
+Route::get('/admin/predstave-za-naslovnu', [PredstaveController::class, 'adminGetPredstaveZaNaslovnu']);
+//Route::get('/admin/komentari-za-naslovnu', [KomentariController::class, 'getKomentariZaNaslovnu']);
+Route::get('/admin/festivali-za-naslovnu', [FestivaliController::class, 'adminGetFestivaliZaNaslovnu']);
+Route::get('/admin/igranja-za-naslovnu', [RepertoariController::class, 'getIgranjaZaNaslovnu']);
+
 Route::get('/admin/tekstovi', [TekstoviController::class, 'adminindex']);
-Route::get('/admin/kategorije', [KategorijeController::class, 'adminindex']);
 Route::get('/get-tekst/{tekstid}', [TekstoviController::class, 'getTekstById']);
-Route::put('update-tekst', [TekstoviController::class, 'update2']);
 Route::put('/admin/tekstovi/istakni', [TekstoviController::class, 'istakniTekst']);
+Route::put('update-tekst', [TekstoviController::class, 'update2']);
+Route::post('/admin/create-tekst', [TekstoviController::class, 'store']);
+/* Admin kategorije */
+Route::get('/admin/kategorije', [KategorijeController::class, 'adminindex']);
+Route::get('/admin/get-single-kategorija/{kategorijaid}', [KategorijeController::class, 'getSingleKategorija']);
+Route::post('/admin/create-kategorija', [KategorijeController::class, 'store']);
+Route::put('/admin/update-kategorija', [KategorijeController::class, 'update']);
+Route::get('/admin/get-sve-kategorije', [KategorijeController::class, 'getSveKategorije']);
+/* Admin zanrovi */
+Route::get('/admin/zanrovi', [ZanroviController::class, 'adminindex']);
+Route::get('/admin/get-single-zanr/{zanrid}', [ZanroviController::class, 'getSingleZanr']);
+Route::post('/admin/create-zanr', [ZanroviController::class, 'store']);
+Route::put('/admin/update-zanr', [ZanroviController::class, 'update']);
+/* Admin tagovi */
+Route::get('/admin/get-svi-tagovi', [TagoviController::class, 'getAllTagovi']);
+Route::post('/admin/tagovi/store', [TagoviController::class, 'storeTags']);
+/* Admin autori */
+Route::get('/admin/get-all-autori', [AutoriController::class, 'getAllAutori']);
+Route::get('/admin/get-single-autor/{autorid}', [AutoriController::class, 'getSingleAutorAdmin']);
+Route::get('/admin/get-gradovi', [PredstaveController::class, 'getGradovi']);
+Route::post('/admin/create-autor', [AutoriController::class, 'store']);
+Route::put('/admin/update-autor', [AutoriController::class, 'update']);
+/* Admin pozorista */
+Route::get('/admin/get-all-pozorista', [PozoristaController::class, 'getAllPozorista']);
+Route::get('/admin/get-single-pozoriste/{pozoristeid}', [PozoristaController::class, 'getSinglePozoristeAdmin']);
+Route::put('/admin/update-pozoriste', [PozoristaController::class, 'update']);
+Route::post('/admin/create-pozoriste', [PozoristaController::class, 'store']);
+/* Admin predstave */
+Route::get('/admin/get-all-predstave', [PredstaveController::class, 'getAllPredstaveAdmin']);
+Route::get('/admin/get-single-predstava/{predstavaid}', [PredstaveController::class, 'getSinglePredstavaById']);
+Route::post('/admin/create-predstava', [PredstaveController::class, 'store']);
+Route::put('/admin/update-predstava', [PredstaveController::class, 'update']);
+
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
