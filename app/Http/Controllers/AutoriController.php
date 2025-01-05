@@ -6,6 +6,7 @@ use App\Models\Autor;
 use App\Http\Resources\AutorResource;
 use Dotenv\Exception\ValidationException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class AutoriController extends Controller
 {
@@ -48,12 +49,20 @@ class AutoriController extends Controller
                 'ime_autora' => 'required',
                 'autor_slug' => 'required|unique:autor',
                 'pozicija' => 'required',
+                //'slika' => 'image|mimes:jpeg,png,jpg'
             ]);
         } catch (ValidationException $e) {
             return response()->json($e, 422);
         }
 
         $autor = new Autor($request->all());
+
+        if ($request->file('slika')) {
+            $fileExtension = $request->file('slika')->extension();
+            $fileName = $request->autor_slug . '.' . $fileExtension;
+            $path = $request->file('slika')->move(base_path() . '/react/public/slike/autori', $fileName);
+            $autor->url_slike = '/slike/autori/' . $fileName;
+        }
         if ($autor->save())
             return response()->json([], 200);
     }

@@ -502,6 +502,34 @@ class TekstoviController extends Controller
         return response()->json(['location' => $imagePath]);
     }
 
+    public function store2(Request $request)
+    {
+
+        // 
+        try {
+            $request->validate([
+                'naslov' => 'required',
+                'slug' => 'required',
+                'uvod' => 'required|max:280 ',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json($e, 422);
+        }
+
+        $tekst = new Tekst();
+
+        $tekst->fill($request->all());
+        if ($tekst->save()) {
+            $tekst->predstave()->sync($request->predstave);
+            $tekst->tagovi()->sync($request->tagovi);
+            $tekst->pozorista()->sync($request->pozorista);
+
+            return response()->json([], 200);
+        } else {
+            return response()->json(["Error adding tekst"], 500);
+        }
+    }
+
     public function getTekstById(Request $request)
     {
         //$tekst = Tekst::with('autori')->with('predstave')->with('pozorista')->findOrFail($request->tekstid); 

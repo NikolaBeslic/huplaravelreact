@@ -10,6 +10,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AutoriController;
 use App\Http\Controllers\RepertoariController;
 use App\Http\Controllers\FestivaliController;
+use App\Http\Controllers\ImageUploadController;
 use App\Http\Controllers\KategorijeController;
 use App\Http\Controllers\TagoviController;
 use App\Http\Controllers\ZanroviController;
@@ -73,7 +74,7 @@ Route::get('/admin/tekstovi', [TekstoviController::class, 'adminindex']);
 Route::get('/get-tekst/{tekstid}', [TekstoviController::class, 'getTekstById']);
 Route::put('/admin/tekstovi/istakni', [TekstoviController::class, 'istakniTekst']);
 Route::put('update-tekst', [TekstoviController::class, 'update2']);
-Route::post('/admin/create-tekst', [TekstoviController::class, 'store']);
+Route::post('/admin/create-tekst', [TekstoviController::class, 'store2']);
 /* Admin kategorije */
 Route::get('/admin/kategorije', [KategorijeController::class, 'adminindex']);
 Route::get('/admin/get-single-kategorija/{kategorijaid}', [KategorijeController::class, 'getSingleKategorija']);
@@ -110,12 +111,13 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::post('/admin/uploadImage', [ImageUploadController::class, 'uploadImage']);
 
 Route::post('/flmngr', function () {
 
     \EdSDK\FlmngrServer\FlmngrServer::flmngrRequest(
         array(
-            'dirFiles' => base_path() . '/public/slike'
+            'dirFiles' => base_path() . '/react/public/slike'
         )
     );
 });
