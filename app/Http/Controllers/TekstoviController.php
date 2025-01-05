@@ -511,14 +511,26 @@ class TekstoviController extends Controller
                 'naslov' => 'required',
                 'slug' => 'required',
                 'uvod' => 'required|max:280 ',
+                'slika' => 'required'
             ]);
         } catch (ValidationException $e) {
             return response()->json($e, 422);
         }
 
         $tekst = new Tekst();
-
         $tekst->fill($request->all());
+        /* handle photo upload */
+        if ($request->file('slika')) {
+            if ($request->kategorijaid) {
+                $kategorija_slug = Kategorija::where('kategorijaid', $request->kategorijaid)->value('kategorija_slug');
+            }
+            $fileExtension = $request->file('slika')->extension();
+            $fileName = $request->slug . '.' . $fileExtension;
+            $path = $request->file('slika')->move(base_path() . '/react/public/slike/' . $kategorija_slug, $fileName);
+            $tekst->tekst_photo = '/slike/' . $kategorija_slug . '/' . $fileName;
+        }
+
+
         if ($tekst->save()) {
             $tekst->predstave()->sync($request->predstave);
             $tekst->tagovi()->sync($request->tagovi);
