@@ -189,12 +189,17 @@ class TekstoviController extends Controller
         return $result;
     }
 
+
+
     public function getCategoryPosts($kategorija_slug)
     {
         $kategorija = Kategorija::where('kategorija_slug', $kategorija_slug)->with('tekstovi')->firstOrFail();
-        //return json_encode($kategorija);
-        $result = KategorijaResource::make($kategorija);
-        return $result;
+        $katIds = $this->getAllKategIds($kategorija);
+        $tekstovi = Tekst::whereIn('kategorijaid', $katIds)->where('is_published', 1)->with('kategorija')->orderBy('published_at', 'desc')->paginate(8);
+        $kategorija->setRelation('tekstovi', $tekstovi);
+        return json_encode($kategorija);
+        // $result = KategorijaResource::make($kategorija);
+        // return $result;
     }
 
     public function getSinglePost($tekst_slug)
@@ -212,7 +217,7 @@ class TekstoviController extends Controller
                 }
             ])
             ->with(['pozorista' => function ($query) {
-                $query->select('naziv_pozorista', 'pozoriste_slug');
+                $query->select('naziv_pozorista', 'pozoriste_slug', 'url_logo');
             }])
             ->with('tagovi')
             ->with('festival')

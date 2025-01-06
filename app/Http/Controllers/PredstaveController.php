@@ -7,6 +7,7 @@ use App\Models\Grad;
 use Illuminate\Http\Request;
 use App\Models\Predstava;
 use App\Models\Zanr;
+use App\Models\Ocena;
 use Dotenv\Exception\ValidationException;
 use stdClass;
 
@@ -178,5 +179,16 @@ class PredstaveController extends Controller
     {
         $predstave = Predstava::with('pozorista')->orderBy('created_at', 'desc')->take(10)->get();
         return json_encode($predstave);
+    }
+
+    public function oceni(Request $request)
+    {
+        $korisnik = $request->user();
+        $predstava = Predstava::find($request->predstavaid);
+        $ocena = new Ocena(['korisnikid' => $korisnik->id, 'predstavaid' => $predstava->predstavaid, 'ocena' => $request->ocena]);
+        if ($ocena->save()) {
+            $predstava->prosecnaOcena = round($predstava->ocena()->avg('ocena'), 1);
+            return PredstavaResource::make($predstava);
+        }
     }
 }

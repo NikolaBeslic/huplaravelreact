@@ -106,6 +106,7 @@ Route::get('/admin/get-single-predstava/{predstavaid}', [PredstaveController::cl
 Route::post('/admin/create-predstava', [PredstaveController::class, 'store']);
 Route::put('/admin/update-predstava', [PredstaveController::class, 'update']);
 
+Route::middleware('auth:sanctum')->post('/predstava/oceni', [PredstaveController::class, 'oceni']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

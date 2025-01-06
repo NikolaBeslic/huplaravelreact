@@ -9,4 +9,5 @@ class Ocena extends Model
     //
 
     protected $table = 'ocenio';
+    protected $fillable = ['predstavaid', 'korisnikid', 'ocena'];
 }
