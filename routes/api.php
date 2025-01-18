@@ -10,6 +10,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AutoriController;
 use App\Http\Controllers\RepertoariController;
 use App\Http\Controllers\FestivaliController;
+use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\ImageUploadController;
 use App\Http\Controllers\KategorijeController;
 use App\Http\Controllers\TagoviController;
@@ -106,7 +107,13 @@ Route::get('/admin/get-single-predstava/{predstavaid}', [PredstaveController::cl
 Route::post('/admin/create-predstava', [PredstaveController::class, 'store']);
 Route::put('/admin/update-predstava', [PredstaveController::class, 'update']);
 
+/* Google Analytics */
+
+Route::get('/auth/google/redirect', [GoogleController::class, 'redirect']);
+Route::get('/auth/google/callback', [GoogleController::class, 'callback']);
+
 Route::middleware('auth:sanctum')->post('/predstava/oceni', [PredstaveController::class, 'oceni']);
+Route::middleware('auth:sanctum')->post('/predstava/dodajNaListuZelja', [PredstaveController::class, 'dodajNaListuZelja']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

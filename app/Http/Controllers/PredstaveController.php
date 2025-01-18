@@ -9,7 +9,9 @@ use App\Models\Predstava;
 use App\Models\Zanr;
 use App\Models\Ocena;
 use Dotenv\Exception\ValidationException;
+use Exception;
 use stdClass;
+use Illuminate\Support\Facades\Auth;
 
 class PredstaveController extends Controller
 {
@@ -45,7 +47,23 @@ class PredstaveController extends Controller
             ->with('komentari')
             ->firstOrFail();
         $predstava->prosecnaOcena = round($predstava->ocena()->avg('ocena'), 1);
+        $predstava->brojOcena = $predstava->ocena()->count();
+        $predstava->ocenaKorisnika = $this->getOcenaKorisnika($predstava);
+        $predstava->naListiZeljaKorisnika = $this->getNaListiZelja($predstava);
         return PredstavaResource::make($predstava);
+    }
+    public function getOcenaKorisnika($predstava)
+    {
+        $korisnikid = auth('sanctum')->user()->id;
+        $ocenaKorisnika = Ocena::where(['predstavaid' => $predstava->predstavaid, 'korisnikid' => $korisnikid])->value('ocena');
+        return $ocenaKorisnika;
+    }
+
+    public function getNaListiZelja($predstava)
+    {
+        $korisnikid = auth('sanctum')->user()->id;
+        $naListiZelja = $predstava->naListiZelja()->where('korisnikid', $korisnikid)->exists();
+        return $naListiZelja;
     }
 
     public function getPredstaveZaNaslovnu()
@@ -188,7 +206,19 @@ class PredstaveController extends Controller
         $ocena = new Ocena(['korisnikid' => $korisnik->id, 'predstavaid' => $predstava->predstavaid, 'ocena' => $request->ocena]);
         if ($ocena->save()) {
             $predstava->prosecnaOcena = round($predstava->ocena()->avg('ocena'), 1);
-            return PredstavaResource::make($predstava);
+            return $this->getSinglePredstava($predstava->predstava_slug);
+        }
+    }
+
+    public function dodajNaListuZelja(Request $request)
+    {
+        $predstava = Predstava::find($request->predstavaid);
+        $korisnik = $request->user();
+        try {
+            $predstava->naListiZelja()->attach($korisnik, ['statuszeljeid' => 1]);
+            return response()->json();
+        } catch (Exception $e) {
+            return response()->json($e->getMessage(), 500);
         }
     }
 }

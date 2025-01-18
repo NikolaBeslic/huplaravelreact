@@ -6,11 +6,14 @@
     "license": "MIT",
     "require": {
         "php": "^8.1",
+        "akki-io/laravel-google-analytics": "^1.8",
         "edsdk/flmngr-server-php": "^1.6",
         "fruitcake/laravel-cors": "^3.0",
+        "google/apiclient": "^2.18",
         "guzzlehttp/guzzle": "^7.0.1",
         "laravel/framework": "^8.75",
         "laravel/sanctum": "^2.11",
+        "laravel/socialite": "^5.16",
         "laravel/tinker": "^2.5"
     },
     "require-dev": {
