@@ -66,18 +66,29 @@ class AuthController extends Controller
 
     public function user()
     {
+
         $user = auth()->user();
         return response($user, 201);
     }
 
-    // public function logout(Request $request)
-    // {
-    //     auth()->user()->tokens()->delete();
+    public function logout(Request $request)
+    {
+        $userId = $request->id;
+        $user = Korisnik::find($userId);
 
-    //     $response = [
-    //         'message' => 'logged out'
-    //     ];
+        // $request->user()->currentAccessToken()->delete();
 
-    //     return response($response, 201);
-    // }
+        $tokenId = $user->tokens()->where('tokenable_id', $user->id)->value('id');
+
+        if ($user->tokens()->where('id', $tokenId)->delete()) {
+            $response = [
+                'message' => 'logged out'
+            ];
+
+            return response($response, 201);
+        }
+        //Auth::user()->currentAccessToken()->delete();
+        //$user->tokens()->where('id', $tokenId)->delete();
+        return response('Error', 500);
+    }
 }

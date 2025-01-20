@@ -62,6 +62,7 @@ Route::get('get-all-tagovi', [TagoviController::class, 'getAllTagovi']);
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout']);
 
 Route::post('/adminlogin', [AdminAuthController::class, 'login']);
 /* Admin naslovna */
