@@ -48,8 +48,12 @@ class PredstaveController extends Controller
             ->firstOrFail();
         $predstava->prosecnaOcena = round($predstava->ocena()->avg('ocena'), 1);
         $predstava->brojOcena = $predstava->ocena()->count();
-        $predstava->ocenaKorisnika = $this->getOcenaKorisnika($predstava);
-        $predstava->naListiZeljaKorisnika = $this->getNaListiZelja($predstava);
+        if (auth('sanctum')->user()) {
+            $predstava->ocenaKorisnika = $this->getOcenaKorisnika($predstava);
+            $predstava->naListiZeljaKorisnika = $this->getNaListiZelja($predstava);
+            $predstava->naListiOdgledanihKorisnika = $this->getNaListiOdgledanih($predstava);
+        }
+
         return PredstavaResource::make($predstava);
     }
     public function getOcenaKorisnika($predstava)
@@ -65,6 +69,13 @@ class PredstaveController extends Controller
         $naListiZelja = $predstava->naListiZelja()->where('korisnikid', $korisnikid)->exists();
         return $naListiZelja;
     }
+    public function getNaListiOdgledanih($predstava)
+    {
+        $korisnikid = auth('sanctum')->user()->id;
+        $naListiZelja = $predstava->naListiOdgledanih()->where('korisnikid', $korisnikid)->exists();
+        return $naListiZelja;
+    }
+
 
     public function getPredstaveZaNaslovnu()
     {
@@ -215,7 +226,28 @@ class PredstaveController extends Controller
         $predstava = Predstava::find($request->predstavaid);
         $korisnik = $request->user();
         try {
-            $predstava->naListiZelja()->attach($korisnik, ['statuszeljeid' => 1]);
+            if ($predstava->naListiOdgledanih()->exists()) {
+                $predstava->naListiZelja()->updateExistingPivot($korisnik, ['statuszeljeid' => 1]);
+            } else {
+                $predstava->naListiZelja()->attach($korisnik, ['statuszeljeid' => 1]);
+            }
+            return response()->json();
+        } catch (Exception $e) {
+            return response()->json($e->getMessage(), 500);
+        }
+    }
+
+    public function dodajUOdgledane(Request $request)
+    {
+        $predstava = Predstava::find($request->predstavaid);
+        $korisnik = auth('sanctum')->user();
+        try {
+            if ($predstava->naListiZelja()->exists()) {
+                $predstava->naListiZelja()->updateExistingPivot($korisnik, ['statuszeljeid' => 2]);
+            } else {
+                $predstava->naListiZelja()->attach($korisnik, ['statuszeljeid' => 2]);
+            }
+
             return response()->json();
         } catch (Exception $e) {
             return response()->json($e->getMessage(), 500);

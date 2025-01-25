@@ -118,6 +118,7 @@ Route::get('/auth/google/callback', [GoogleController::class, 'callback']);
 
 Route::middleware('auth:sanctum')->post('/predstava/oceni', [PredstaveController::class, 'oceni']);
 Route::middleware('auth:sanctum')->post('/predstava/dodajNaListuZelja', [PredstaveController::class, 'dodajNaListuZelja']);
+Route::middleware('auth:sanctum')->post('/predstava/dodajUOdgledane', [PredstaveController::class, 'dodajUOdgledane']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

@@ -29,6 +29,7 @@ class PredstavaResource extends JsonResource
             'brojOcena' => $this->brojOcena,
             'ocenaKorisnika' => $this->ocenaKorisnika,
             'naListiZeljaKorisnika' => $this->naListiZeljaKorisnika,
+            'naListiOdgledanihKorisnika' => $this->naListiOdgledanihKorisnika,
             'pozorista' => PozoristeResource::collection($this->pozorista),
             'tekstovi' => TekstResource::collection($this->tekstovi),
             'zanrovi' => ZanrResource::collection($this->zanrovi),
