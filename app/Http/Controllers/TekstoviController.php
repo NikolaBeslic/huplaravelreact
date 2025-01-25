@@ -202,9 +202,10 @@ class TekstoviController extends Controller
         // return $result;
     }
 
-    public function getSinglePost($tekst_slug)
+    public function getSinglePost($kategorija_slug, $tekst_slug)
     {
-        $tekst = Tekst::where('slug', $tekst_slug)
+        $kategorija = Kategorija::where('kategorija_slug', $kategorija_slug)->firstOrFail();
+        $tekst = Tekst::where(['slug' => $tekst_slug, 'kategorijaid' => $kategorija->kategorijaid, 'is_published' => 1])
             ->with('kategorija')
             ->with([
                 'autori' => function ($query) {

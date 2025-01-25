@@ -13,6 +13,7 @@ use App\Http\Controllers\FestivaliController;
 use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\ImageUploadController;
 use App\Http\Controllers\KategorijeController;
+use App\Http\Controllers\KorisniciController;
 use App\Http\Controllers\TagoviController;
 use App\Http\Controllers\ZanroviController;
 
@@ -33,7 +34,7 @@ Route::get('/get-slider-posts', [TekstoviController::class, 'getSliderPosts']);
 Route::get('/get-posts', [TekstoviController::class, 'getPosts']);
 Route::get('/get-category-posts/{katergorija_slug}', [TekstoviController::class, 'getCategoryPosts']);
 Route::get('/intervju/{slug}', [TekstoviController::class, 'getIntervju']);
-Route::get('/get-single-text/{slug}', [TekstoviController::class, 'getSinglePost']);
+Route::get('/get-single-text/{kategorija_slug}/{slug}', [TekstoviController::class, 'getSinglePost']);
 Route::get('/get-related-posts/{tekstid}', [TekstoviController::class, 'getRelatedPosts']);
 // Predstave
 Route::get('/get-predstave', [PredstaveController::class, 'getPredstave']);
@@ -63,6 +64,8 @@ Route::get('get-all-tagovi', [TagoviController::class, 'getAllTagovi']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout']);
+
+Route::middleware('auth:sanctum')->get('/get-korisnicki-profil', [KorisniciController::class, 'getKorisnickiProfil']);
 
 Route::post('/adminlogin', [AdminAuthController::class, 'login']);
 /* Admin naslovna */
