@@ -9,7 +9,7 @@ class Kategorija extends Model
     //
     protected $table = 'kategorija';
     protected $primaryKey = 'kategorijaid';
-    protected $fillable = ['naziv_kategorije', 'kategorija_slug', 'kategorija_boja', 'parent_kategorija'];
+    protected $fillable = ['naziv_kategorije', 'kategorija_slug', 'kategorija_boja', 'parent_kategorija', 'display_naziv_kategorije'];
     public $timestamps = false;
 
     public function tekstovi()
