@@ -37,4 +37,9 @@ class Pozoriste extends Model
     {
         return $this->belongsToMany(Tekst::class, 'tekst_pozoriste', 'pozoristeid', 'tekstid')->orderBy('tekst.published_at', 'desc');
     }
+
+    public function omiljeno()
+    {
+        return $this->belongsToMany(Korisnik::class, 'omiljena_pozorista', 'pozoristeid', 'korisnikid');
+    }
 }

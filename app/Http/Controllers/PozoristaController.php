@@ -8,6 +8,7 @@ use App\Igranje;
 use Illuminate\Http\Request;
 use App\Models\Pozoriste;
 use Dotenv\Exception\ValidationException;
+use Exception;
 
 class PozoristaController extends Controller
 {
@@ -36,6 +37,11 @@ class PozoristaController extends Controller
                 $query->select('predstava.predstavaid', 'naziv_predstave', 'predstava_slug', 'plakat', 'premijera')->orderBy('premijera', 'desc');
             }, 'predstave.zanrovi'])
             ->firstOrFail();
+
+        if (auth('sanctum')->user()) {
+            $pozoriste->omiljenoKorisnika = $this->getOmiljenoKorisnika($pozoriste);
+        }
+
         return json_encode($pozoriste);
         // return $pozoriste;
         //return IgranjeResource::collection($pozoriste->igranja);
@@ -84,5 +90,23 @@ class PozoristaController extends Controller
         if ($pozoriste->save()) {
             return response()->json([], 200);
         }
+    }
+
+    public function dodajUOmiljena(Request $request)
+    {
+        $pozoriste = Pozoriste::find($request->pozoristeId);
+        $korisnik = auth('sanctum')->user();
+        try {
+            $pozoriste->omiljeno()->attach($korisnik->id);
+            return response()->json();
+        } catch (Exception $e) {
+            return response()->json($e->getMessage(), 500);
+        }
+    }
+
+    public function getOmiljenoKorisnika($pozoriste)
+    {
+        $korisnikId = auth('sanctum')->user()->id;
+        return $pozoriste->omiljeno()->where('korisnikid', $korisnikId)->exists();
     }
 }

@@ -14,6 +14,7 @@ class KorisniciController extends Controller
             ->with('listaZelja')
             ->with('listaOdgledanih')
             ->with('komentari')
+            ->with('omiljenaPozorista')
             ->firstOrFail();
         return json_encode($korisnik);
     }
