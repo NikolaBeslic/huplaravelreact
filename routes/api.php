@@ -11,6 +11,7 @@ use App\Http\Controllers\AutoriController;
 use App\Http\Controllers\RepertoariController;
 use App\Http\Controllers\FestivaliController;
 use App\Http\Controllers\GoogleController;
+use App\Http\Controllers\HuPkastController;
 use App\Http\Controllers\ImageUploadController;
 use App\Http\Controllers\KategorijeController;
 use App\Http\Controllers\KorisniciController;
@@ -111,8 +112,11 @@ Route::get('/admin/get-single-predstava/{predstavaid}', [PredstaveController::cl
 Route::post('/admin/create-predstava', [PredstaveController::class, 'store']);
 Route::put('/admin/update-predstava', [PredstaveController::class, 'update']);
 
-/* Google Analytics */
+/* Admin HuPkast */
+Route::get('/admin/check-hupkast-rss', [HuPkastController::class, 'checkHuPkastRSS']);
+Route::get('/admin/hupkast/insert-new-episodes', [HuPkastController::class, 'insertHuPkastFromRss']);
 
+/* Google Analytics */
 Route::get('/auth/google/redirect', [GoogleController::class, 'redirect']);
 Route::get('/auth/google/callback', [GoogleController::class, 'callback']);
 

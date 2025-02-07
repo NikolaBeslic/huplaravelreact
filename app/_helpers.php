@@ -1,7 +1,7 @@
 <?php
 
-use App\Predstava;
-use App\Tekst;
+use App\Models\Predstava;
+use App\Models\Tekst;
 
 if (!function_exists('prikaziTekstove')) {
   function prikaziTekstove($kategorija)

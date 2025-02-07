@@ -10,8 +10,9 @@ class Hupkast extends Model
 
     protected $table = 'hupkast';
     protected $primaryKey = 'hupkastid';
-    protected $fillable = ['hupkastid'];
+    protected $fillable = ['hupkastid', 'sezona', 'epizoda', 'mp3_url', 'tekstid'];
     protected $guarded = [];
+    public $timestamps = false;
 
     public function tekst()
     {

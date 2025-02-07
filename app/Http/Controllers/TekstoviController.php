@@ -112,7 +112,7 @@ class TekstoviController extends Controller
 
     public function getPosts()
     {
-        $intervjui = Tekst::select('tekstid', 'naslov', 'slug', 'uvod', 'tekst_photo', 'kategorijaid', 'na_slajderu', 'created_at')
+        $intervjui = Tekst::select('tekstid', 'naslov', 'slug', 'uvod', 'tekst_photo', 'kategorijaid', 'na_slajderu', 'published_at')
             ->with('kategorija')
             ->with([
                 'predstave' => function ($query) {
@@ -125,9 +125,9 @@ class TekstoviController extends Controller
                 }
             ])
             ->where('kategorijaid', 2)
-            ->orderBy('created_at', 'desc')
+            ->orderBy('published_at', 'desc')
             ->take(10);
-        $recenzije = Tekst::select('tekstid', 'naslov', 'slug', 'uvod', 'tekst_photo', 'kategorijaid', 'na_slajderu', 'created_at')
+        $recenzije = Tekst::select('tekstid', 'naslov', 'slug', 'uvod', 'tekst_photo', 'kategorijaid', 'na_slajderu', 'published_at')
             ->where('kategorijaid', 4)
             ->with('kategorija')
             ->with([
@@ -140,9 +140,9 @@ class TekstoviController extends Controller
                     $query->select('ime_autora', 'autor_slug', 'url_slike');
                 }
             ])
-            ->orderBy('created_at', 'desc')
+            ->orderBy('published_at', 'desc')
             ->take(10);
-        $vesti = Tekst::select('tekstid', 'naslov', 'slug', 'uvod', 'tekst_photo', 'kategorijaid', 'na_slajderu', 'created_at')
+        $vesti = Tekst::select('tekstid', 'naslov', 'slug', 'uvod', 'tekst_photo', 'kategorijaid', 'na_slajderu', 'published_at')
             ->where('kategorijaid', 1)
             ->with('kategorija')
             ->with([
@@ -155,9 +155,9 @@ class TekstoviController extends Controller
                     $query->select('ime_autora', 'autor_slug', 'url_slike');
                 }
             ])
-            ->orderBy('created_at', 'desc')
+            ->orderBy('published_at', 'desc')
             ->take(10);
-        $naSlajderu  = Tekst::select('tekstid', 'naslov', 'slug', 'uvod', 'tekst_photo', 'kategorijaid', 'na_slajderu', 'created_at')
+        $naSlajderu  = Tekst::select('tekstid', 'naslov', 'slug', 'uvod', 'tekst_photo', 'kategorijaid', 'na_slajderu', 'published_at')
             ->where('na_slajderu', 1)
             ->with('kategorija')
             ->with([
@@ -170,9 +170,9 @@ class TekstoviController extends Controller
                     $query->select('ime_autora', 'autor_slug', 'url_slike');
                 }
             ])
-            ->orderBy('created_at', 'desc')
+            ->orderBy('published_at', 'desc')
             ->take(5);
-        $hupkast = Tekst::select('tekstid', 'naslov', 'slug', 'uvod', 'tekst_photo', 'kategorijaid', 'na_slajderu', 'created_at')
+        $hupkast = Tekst::select('tekstid', 'naslov', 'slug', 'uvod', 'tekst_photo', 'kategorijaid', 'na_slajderu', 'published_at')
             ->where('kategorijaid', 11)
             ->with('kategorija')
             ->with([
@@ -180,10 +180,10 @@ class TekstoviController extends Controller
                     $query->select('ime_autora', 'autor_slug', 'url_slike');
                 }
             ])
-            ->orderBy('created_at', 'desc');
+            ->orderBy('published_at', 'desc')->take(3);
 
 
-        $tekstovi = $intervjui->union($recenzije)->union($vesti)->union($naSlajderu)->orderBy('created_at', 'desc')->union($hupkast)->get();
+        $tekstovi = $intervjui->union($recenzije)->union($vesti)->union($naSlajderu)->orderBy('published_at', 'desc')->union($hupkast)->get();
         // $result = TekstResource::collection($tekstovi);
         $result = json_encode($tekstovi);
         return $result;
