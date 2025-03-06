@@ -3,14 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Hupkast;
-use App\Models\Kategorija;
 use App\Models\Tekst;
 use Illuminate\Http\Request;
 use Dotenv\Exception\ValidationException;
+use Exception;
 use Illuminate\Support\Facades\Http;
 use stdClass;
 use willvincent\Feeds\Facades\FeedsFacade;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 
 class HuPkastController extends Controller
@@ -23,12 +24,22 @@ class HuPkastController extends Controller
         $itemsNo = count($feed->get_items());
         $hupkastNumber = Tekst::where('kategorijaid', 11)->where('is_published', 1)->count();
         $responseText = 'Neuspesna provera';
+        $status = 500;
         if ($itemsNo == $hupkastNumber) {
             $responseText = 'Nema novih epizoda';
             $status = 304;
         } else if ($itemsNo > $hupkastNumber) {
-            $responseText = 'Nove epizode u RSS';
-            $status = 200;
+            try {
+                $result = $this->insertHuPkastFromRss();
+                $responseText = 'Dodate nove epizode iz RSS: ' . $result;
+                $status = 200;
+            } catch (Exception $e) {
+                $responseText = 'Greska prilikom dodavanje epizoda: ' . $e;
+                $status = 401;
+            }
+        } else {
+            $responseText = 'Ima vise epizoda u bazi nego u RSS. Proveri to';
+            $status = 400;
         }
         return response()->json($responseText, $status);
     }
@@ -75,34 +86,62 @@ class HuPkastController extends Controller
     public function insertHuPkastFromRss()
     {
         $arr = $this->getHuPkastRssItems();
+        $result = false;
+        $counter = 0;
         foreach ($arr as $item) {
-            $tekst = new Tekst();
-            $tekst->naslov = $item->title;
-            $tekst->slug = Str::slug($item->title);
-            $tekst->uvod = substr($item->description, 0, 200);
-            $tekst->sadrzaj = $item->description;
-            $tekst->kategorijaid = 11;
-            if ($item->image) {
-                $httpResponse = Http::get($item->image);
-                if ($httpResponse->successful()) {
-                    $imageUrl = base_path() . '/react/public/slike/hupkast/';
-                    $extension =  pathinfo(parse_url($item->image, PHP_URL_PATH), PATHINFO_EXTENSION);
-                    $fileName = $imageUrl . Str::slug($item->title) . '.' . $extension;
-                    if (file_put_contents($fileName, $httpResponse->body()))
-                        $tekst->tekst_photo = '/slike/hupkast/' . Str::slug($item->title) . '.jpg';
+            if (!$this->checkIfHuPkastExists($item)) {
+
+
+                $tekst = new Tekst();
+                $tekst->naslov = $item->title;
+                $tekst->slug = Str::slug($item->title);
+                $tekst->uvod = substr($item->description, 0, 200);
+                $tekst->sadrzaj = $item->description;
+                $tekst->kategorijaid = 11;
+                if ($item->image) {
+                    $httpResponse = Http::get($item->image);
+                    if ($httpResponse->successful()) {
+                        $imageUrl = base_path() . '/react/public/slike/hupkast/';
+                        $extension =  pathinfo(parse_url($item->image, PHP_URL_PATH), PATHINFO_EXTENSION);
+                        $fileName = $imageUrl . Str::slug($item->title) . '.' . $extension;
+                        if (file_put_contents($fileName, $httpResponse->body()))
+                            $tekst->tekst_photo = '/slike/hupkast/' . Str::slug($item->title) . '.jpg';
+                    }
+                }
+                $tekst->is_published = 1;
+                $tekst->published_at = $item->published_at;
+                if ($tekst->save()) {
+
+                    $hupkast = new Hupkast();
+                    $hupkast->sezona = $item->sezona;
+                    $hupkast->epizoda = $item->epizoda;
+                    $hupkast->mp3_url = $item->mp3_url;
+                    $hupkast->tekstid = $tekst->tekstid;
+                    if ($hupkast->save()) {
+                        $result = true;
+                        $counter++;
+                    }
                 }
             }
-            $tekst->is_published = 1;
-            $tekst->published_at = $item->published_at;
-            $tekst->save();
-
-            $hupkast = new Hupkast();
-            $hupkast->sezona = $item->sezona;
-            $hupkast->epizoda = $item->epizoda;
-            $hupkast->mp3_url = $item->mp3_url;
-            $hupkast->tekstid = $tekst->tekstid;
-            $hupkast->save();
         }
-        return "ok";
+        return $counter;
+    }
+
+    public function adminGetAllHupkast()
+    {
+        $allHuPkast = Tekst::where(['kategorijaid' => 11, 'is_published' => 1])->with('hupkast.linkovi')->get();
+        return json_encode($allHuPkast);
+    }
+
+    public function getHupkastPlatforme()
+    {
+        $hupkastPlatforme = DB::table('hupkast_platforme')->get();
+        return json_encode($hupkastPlatforme);
+    }
+
+    public function checkIfHuPkastExists($item)
+    {
+        $result = Tekst::where(['kategorijaid' => 11, 'naslov' => $item->title, 'is_published' => 1])->exists();
+        return $result;
     }
 }

@@ -11,6 +11,7 @@ use App\Models\Kategorija;
 use App\Models\Pozoriste;
 use App\Models\Tekst;
 use App\Models\Hupikon;
+use App\Models\Hupkast;
 use Dotenv\Exception\ValidationException;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
@@ -467,6 +468,13 @@ class TekstoviController extends Controller
             $tekst->tagovi()->sync($request->tagovi);
             $tekst->pozorista()->sync($request->pozorista);
 
+            if ($tekst->kategorijaid == 11) {
+                $hupkast = new Hupkast();
+                $hupkast->sezona = $request->sezona;
+                $hupkast->epizoda = $request->epizoda;
+                $hupkast->mp3_url = $request->mp3_url;
+            }
+
             return response()->json([], 200);
         }
     }
@@ -551,7 +559,7 @@ class TekstoviController extends Controller
     public function getTekstById(Request $request)
     {
         //$tekst = Tekst::with('autori')->with('predstave')->with('pozorista')->findOrFail($request->tekstid); 
-        $tekst = Tekst::with(['autori', 'predstave', 'pozorista', 'tagovi', 'festival'])->findOrFail($request->tekstid);
+        $tekst = Tekst::with(['autori', 'predstave', 'pozorista', 'tagovi', 'festival', 'hupkast.linkovi'])->findOrFail($request->tekstid);
         return json_encode($tekst);
     }
 
@@ -577,5 +585,26 @@ class TekstoviController extends Controller
     {
         $tekstovi = Tekst::with('kategorija')->orderBy('created_at', 'desc')->take(10)->get();
         return json_encode($tekstovi);
+    }
+
+    public function hupkastStore(Request $request)
+    {
+        $this->store2($request);
+        $tekst = Tekst::latest('tekstid')->first();
+        $hupkast = new Hupkast();
+        $hupkast->sezona = $request->sezona;
+        $hupkast->epizoda = $request->epizoda;
+        $hupkast->mp3_url = $request->mp3_url;
+        $hupkast->tekstid = $tekst->tekstid;
+
+        if ($hupkast->save()) {
+            foreach ($request->hupkast_linkovi as $hl) {
+                $hupkast->linkovi()->attach($hupkast->hupkastid, ['platformaid' => $hl['platformaid'], 'hupkast_url' => $hl['link']]);
+            }
+
+            return response()->json([], 200);
+        } else {
+            return response()->json(["Error adding hupkast"], 500);
+        }
     }
 }

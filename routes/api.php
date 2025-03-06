@@ -115,6 +115,9 @@ Route::put('/admin/update-predstava', [PredstaveController::class, 'update']);
 /* Admin HuPkast */
 Route::get('/admin/check-hupkast-rss', [HuPkastController::class, 'checkHuPkastRSS']);
 Route::get('/admin/hupkast/insert-new-episodes', [HuPkastController::class, 'insertHuPkastFromRss']);
+Route::get('/admin/get-all-hupkast', [HuPkastController::class, 'adminGetAllHupkast']);
+Route::post('/admin/hupkast-store', [TekstoviController::class, 'hupkastStore']);
+Route::get('/admin/get-hupkast-platforme', [HuPkastController::class, 'getHupkastPlatforme']);
 
 /* Google Analytics */
 Route::get('/auth/google/redirect', [GoogleController::class, 'redirect']);
