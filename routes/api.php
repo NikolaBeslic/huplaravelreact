@@ -119,6 +119,10 @@ Route::get('/admin/get-all-hupkast', [HuPkastController::class, 'adminGetAllHupk
 Route::post('/admin/hupkast-store', [TekstoviController::class, 'hupkastStore']);
 Route::get('/admin/get-hupkast-platforme', [HuPkastController::class, 'getHupkastPlatforme']);
 
+/* Admin HuPikon */
+Route::get('/admin/get-all-hupikon', [TekstoviController::class, 'adminGetAllHupikon']);
+Route::post('/admin/hupikon-store', [TekstoviController::class, 'hupikonStore']);
+
 /* Google Analytics */
 Route::get('/auth/google/redirect', [GoogleController::class, 'redirect']);
 Route::get('/auth/google/callback', [GoogleController::class, 'callback']);

@@ -14,6 +14,7 @@ use App\Models\Hupikon;
 use App\Models\Hupkast;
 use Dotenv\Exception\ValidationException;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException as ValidationValidationException;
 use JsonSerializable;
@@ -196,7 +197,7 @@ class TekstoviController extends Controller
     {
         $kategorija = Kategorija::where('kategorija_slug', $kategorija_slug)->with('tekstovi')->firstOrFail();
         $katIds = $this->getAllKategIds($kategorija);
-        $tekstovi = Tekst::whereIn('kategorijaid', $katIds)->where('is_published', 1)->with('kategorija')->orderBy('published_at', 'desc')->paginate(8);
+        $tekstovi = Tekst::whereIn('kategorijaid', $katIds)->where('is_published', 1)->with(['kategorija'])->orderBy('published_at', 'desc')->paginate(8);
         $kategorija->setRelation('tekstovi', $tekstovi);
         return json_encode($kategorija);
         // $result = KategorijaResource::make($kategorija);
@@ -460,7 +461,7 @@ class TekstoviController extends Controller
             return response()->json($e, 422);
         }
 
-        $tekst =  Tekst::where('tekstid', $request->tekstid)->firstOrFail();
+        $tekst =  Tekst::where('tekstid', $request->tekstid)->with('hupkast.linkovi')->firstOrFail();
 
         $tekst->fill($request->all());
         if ($tekst->save()) {
@@ -469,11 +470,25 @@ class TekstoviController extends Controller
             $tekst->pozorista()->sync($request->pozorista);
 
             if ($tekst->kategorijaid == 11) {
-                $hupkast = new Hupkast();
+                $hupkast = Hupkast::with('linkovi')->where('tekstid', $tekst->tekstid)->firstOrFail();
                 $hupkast->sezona = $request->sezona;
                 $hupkast->epizoda = $request->epizoda;
                 $hupkast->mp3_url = $request->mp3_url;
+
+                $platformData = collect($request->hupkast_linkovi) // Expecting array of objects
+                    ->filter(fn($item) => !is_null($item['hupkast_url']))
+                    ->mapWithKeys(fn($item) => [$item['platformaid'] => ['hupkast_url' => $item['hupkast_url']]])
+                    ->toArray();
+
+                $hupkast->linkovi()->sync($platformData);
             }
+
+            if ($tekst->kategorijaid == 5) {
+                $hupikon = Hupikon::where('tekstid', $tekst->tekstid)->firstOrFail();
+                $hupikon->fill($request->all());
+                $hupikon->save();
+            }
+
 
             return response()->json([], 200);
         }
@@ -559,7 +574,7 @@ class TekstoviController extends Controller
     public function getTekstById(Request $request)
     {
         //$tekst = Tekst::with('autori')->with('predstave')->with('pozorista')->findOrFail($request->tekstid); 
-        $tekst = Tekst::with(['autori', 'predstave', 'pozorista', 'tagovi', 'festival', 'hupkast.linkovi'])->findOrFail($request->tekstid);
+        $tekst = Tekst::with(['autori', 'predstave', 'pozorista', 'tagovi', 'festival', 'hupkast.linkovi', 'hupikon'])->findOrFail($request->tekstid);
         return json_encode($tekst);
     }
 
@@ -605,6 +620,26 @@ class TekstoviController extends Controller
             return response()->json([], 200);
         } else {
             return response()->json(["Error adding hupkast"], 500);
+        }
+    }
+
+    public function adminGetAllHupikon()
+    {
+        $allHupikon = Tekst::where('kategorijaid', 5)->with('hupikon')->orderBy('published_at', 'desc')->get();
+        return json_encode($allHupikon);
+    }
+
+    public function hupikonStore(Request $request)
+    {
+        $this->store2($request);
+        $tekst = Tekst::latest('tekstid')->first();
+        $hupikon = new Hupikon($request->all());
+        $hupikon->hupikon_slug = Str::slug($request->sagovornik);
+        $hupikon->tekstid = $tekst->tekstid;
+        if ($hupikon->save()) {
+            return response()->json([], 200);
+        } else {
+            return response()->json(["Error adding hupikon"], 500);
         }
     }
 }
