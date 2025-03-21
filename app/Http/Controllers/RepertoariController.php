@@ -3,12 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Igranje;
-use App\Models\Pozoriste;
-use App\Models\Zanr;
-use App\Models\Predstava;
-use Illuminate\Database\Eloquent\Builder;
+use Dotenv\Exception\ValidationException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\File;
 
 class RepertoariController extends Controller
 {
@@ -41,5 +37,52 @@ class RepertoariController extends Controller
             $igr->url = '/predstave/' . $igr->predstava->predstava_slug;
         }
         return json_encode($igranja);
+    }
+
+    public function igranjeStore(Request $request)
+    {
+
+        try {
+            $request->validate([
+                'pozoristeid' => 'required',
+                'predstavaid' => 'required',
+                'vreme' => 'required|',
+                'datum' => 'required|date',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json($e, 422);
+        }
+
+        $igranje = new Igranje($request->all());
+        if ($igranje->save()) {
+            $igranjaPozorista = $this->fetchIgranjaFromDb($request->pozoristeid);
+            return response()->json($igranjaPozorista);
+        }
+        return response()->json('greska prilikom cuvanja izvodjenja', 500);
+    }
+
+    public function getIgranjaPozorista($pozoristeid)
+    {
+        $igranja = $this->fetchIgranjaFromDb($pozoristeid);
+        return json_encode($igranja);
+    }
+
+    public function fetchIgranjaFromDb($pozoristeid)
+    {
+        $igranja = Igranje::where('pozoristeid', $pozoristeid)
+            ->with(['pozoriste' => function ($query) {
+                $query->select('naziv_pozorista', 'pozoriste_slug');
+            }])
+            ->with(['predstava' => function ($query) {
+                $query->select('naziv_predstave', 'predstava_slug', 'predstavaid', 'plakat')
+                    ->with(['zanrovi' => function ($query) {
+                        $query->select('naziv_zanra', 'zanr_slug');
+                    }]);
+            }])
+            ->with('scena')
+            ->orderBy('seigraid', 'desc')
+            ->take(50)
+            ->get();
+        return $igranja;
     }
 }

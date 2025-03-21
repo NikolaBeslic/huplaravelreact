@@ -109,4 +109,18 @@ class PozoristaController extends Controller
         $korisnikId = auth('sanctum')->user()->id;
         return $pozoriste->omiljeno()->where('korisnikid', $korisnikId)->exists();
     }
+
+    public function getPozoristeWithPredstave($pozoriste_slug)
+    {
+        $pozoriste = Pozoriste::where('pozoriste_slug', $pozoriste_slug)
+            ->with([
+                'predstave' =>  function ($query) {
+                    $query->orderBy('naziv_predstave');
+                },
+                'scene'
+            ])
+
+            ->firstOrFail();
+        return json_encode($pozoriste);
+    }
 }

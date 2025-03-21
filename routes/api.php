@@ -123,6 +123,11 @@ Route::get('/admin/get-hupkast-platforme', [HuPkastController::class, 'getHupkas
 Route::get('/admin/get-all-hupikon', [TekstoviController::class, 'adminGetAllHupikon']);
 Route::post('/admin/hupikon-store', [TekstoviController::class, 'hupikonStore']);
 
+/* Admin Reperotari */
+Route::get('/admin/pozoriste-with-predstave/{pozoriste_slug}', [PozoristaController::class, 'getPozoristeWithPredstave']);
+Route::get('/admin/get-igranja-pozorista/{pozoristeid}', [RepertoariController::class, 'getIgranjaPozorista']);
+Route::post('/admin/igranje-store', [RepertoariController::class, 'igranjeStore']);
+
 /* Google Analytics */
 Route::get('/auth/google/redirect', [GoogleController::class, 'redirect']);
 Route::get('/auth/google/callback', [GoogleController::class, 'callback']);
