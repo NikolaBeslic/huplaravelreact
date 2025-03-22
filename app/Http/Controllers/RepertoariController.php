@@ -3,8 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Igranje;
+use App\Models\Pozoriste;
+use App\Models\Predstava;
+use App\Models\Scena;
 use Dotenv\Exception\ValidationException;
 use Illuminate\Http\Request;
+use stdClass;
 
 class RepertoariController extends Controller
 {
@@ -55,7 +59,11 @@ class RepertoariController extends Controller
 
         $igranje = new Igranje($request->all());
         if ($igranje->save()) {
-            $igranjaPozorista = $this->fetchIgranjaFromDb($request->pozoristeid);
+            if ($request->gostovanje) {
+                $igranjaPozorista = $this->fetchSvaIgranjaFromDb();
+            } else {
+                $igranjaPozorista = $this->fetchIgranjaFromDb($request->pozoristeid);
+            }
             return response()->json($igranjaPozorista);
         }
         return response()->json('greska prilikom cuvanja izvodjenja', 500);
@@ -84,5 +92,73 @@ class RepertoariController extends Controller
             ->take(50)
             ->get();
         return $igranja;
+    }
+
+    public function fetchSvaIgranjaFromDb()
+    {
+        $igranja = Igranje::with(['pozoriste' => function ($query) {
+            $query->select('naziv_pozorista', 'pozoriste_slug');
+        }])
+            ->with(['predstava' => function ($query) {
+                $query->select('naziv_predstave', 'predstava_slug', 'predstavaid', 'plakat')
+                    ->with(['zanrovi' => function ($query) {
+                        $query->select('naziv_zanra', 'zanr_slug');
+                    }]);
+            }])
+            ->with('scena')
+            ->orderBy('seigraid', 'desc')
+            ->take(50)
+            ->get();
+        return $igranja;
+    }
+
+    public function getAllForGostovanja()
+    {
+        $pozorista = Pozoriste::select('pozoristeid', 'naziv_pozorista')->orderBy('naziv_pozorista')->get();
+        $predstave = $this->vratiPredstaveZaDropdown2();
+        $scene = Scena::select('scenaid', 'naziv_scene', 'pozoristeid')->get();
+        $igranja = $this->fetchSvaIgranjaFromDb();
+        $result = new stdClass();
+        $result->pozorista = $pozorista;
+        $result->predstave = $predstave;
+        $result->scene = $scene;
+        $result->igranja = $igranja;
+        return json_encode($result);
+    }
+
+    public function vratiPredstaveZaDropdown2()
+    {
+        $predstave = Predstava::select('predstavaid', 'naziv_predstave')->with(['pozorista' => function ($query) {
+            $query->select('naziv_pozorista', 'pozoriste.pozoristeid');
+        }])->orderBy('naziv_predstave', 'asc')->get();
+
+        $predstaveCounts = $predstave->groupBy('naziv_predstave')->map->count();
+
+        foreach ($predstave as $pred) {
+            if ($predstaveCounts[$pred->naziv_predstave] > 1) {
+                $pred->naziv_predstave = $pred->naziv_predstave . ' - ' . $pred->pozorista->pluck('naziv_pozorista')->implode(', ');
+            }
+        }
+        return $predstave;
+    }
+
+    public function vratiPredstaveZaDropdown()
+    {
+        $predstave = Predstava::select('predstavaid', 'naziv_predstave')->with(['pozorista' => function ($query) {
+            $query->select('naziv_pozorista', 'pozoriste.pozoristeid');
+        }])->orderBy('naziv_predstave', 'asc')->get();
+        foreach ($predstave as $pred) {
+            $brojNazivaPredstava = $this->izbrojNazivePredstava($pred);
+            if ($brojNazivaPredstava > 1) {
+                $pred->naziv_predstave = $pred->naziv_predstave . ' - ' . $pred->pozorista->pluck('naziv_pozorista')->implode(', ');
+            }
+        }
+        return $predstave;
+    }
+
+    public function izbrojNazivePredstava($predstava)
+    {
+        $broj = Predstava::where('naziv_predstave', $predstava->naziv_predstave)->count();
+        return $broj;
     }
 }

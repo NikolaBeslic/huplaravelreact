@@ -127,6 +127,8 @@ Route::post('/admin/hupikon-store', [TekstoviController::class, 'hupikonStore'])
 Route::get('/admin/pozoriste-with-predstave/{pozoriste_slug}', [PozoristaController::class, 'getPozoristeWithPredstave']);
 Route::get('/admin/get-igranja-pozorista/{pozoristeid}', [RepertoariController::class, 'getIgranjaPozorista']);
 Route::post('/admin/igranje-store', [RepertoariController::class, 'igranjeStore']);
+Route::get('/admin/get-all-for-gostovanja', [RepertoariController::class, 'getAllForGostovanja']);
+
 
 /* Google Analytics */
 Route::get('/auth/google/redirect', [GoogleController::class, 'redirect']);
