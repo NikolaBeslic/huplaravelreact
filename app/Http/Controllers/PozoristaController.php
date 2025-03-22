@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\IgranjeResource;
 use App\Http\Resources\PozoristeResource;
 use App\Igranje;
+use App\Models\Grad;
 use Illuminate\Http\Request;
 use App\Models\Pozoriste;
 use Dotenv\Exception\ValidationException;
@@ -122,5 +123,22 @@ class PozoristaController extends Controller
 
             ->firstOrFail();
         return json_encode($pozoriste);
+    }
+
+    public function gradStore(Request $request)
+    {
+        try {
+            $request->validate([
+                'naziv_grada' => 'required|unique:grad,naziv_grada',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json($e, 422);
+        }
+        $grad = new Grad($request->all());
+        if ($grad->save()) {
+            $gradovi = Grad::orderBy('naziv_grada')->get();
+            return response()->json($gradovi);
+        }
+        return response()->json("Greska prilikom cuvanja grada", 500);
     }
 }

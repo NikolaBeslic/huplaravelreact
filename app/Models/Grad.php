@@ -11,6 +11,7 @@ class Grad extends Model
     protected $table = 'grad';
     protected $primaryKey = 'gradid';
     protected $fillable = ['naziv_grada'];
+    public $timestamps = false;
 
     public function pozorista()
     {

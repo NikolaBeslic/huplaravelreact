@@ -129,6 +129,8 @@ Route::get('/admin/get-igranja-pozorista/{pozoristeid}', [RepertoariController::
 Route::post('/admin/igranje-store', [RepertoariController::class, 'igranjeStore']);
 Route::get('/admin/get-all-for-gostovanja', [RepertoariController::class, 'getAllForGostovanja']);
 
+/* Admin Grad */
+Route::post("/admin/store-grad", [PozoristaController::class, 'gradStore']);
 
 /* Google Analytics */
 Route::get('/auth/google/redirect', [GoogleController::class, 'redirect']);
