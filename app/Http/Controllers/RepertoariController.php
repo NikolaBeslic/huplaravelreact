@@ -58,6 +58,14 @@ class RepertoariController extends Controller
         }
 
         $igranje = new Igranje($request->all());
+
+        if (!$this->daLiJePozoristeSlobodno($igranje))
+            return response()->json('Pozoriste je zauzeto u ovom terminu', 500);
+
+        if (!$this->daLiSePredstavaVecIgraNegde($igranje))
+            return response()->json('Predstava se vec igra negde u ovom terminu', 500);
+
+
         if ($igranje->save()) {
             if ($request->gostovanje) {
                 $igranjaPozorista = $this->fetchSvaIgranjaFromDb();
@@ -160,5 +168,21 @@ class RepertoariController extends Controller
     {
         $broj = Predstava::where('naziv_predstave', $predstava->naziv_predstave)->count();
         return $broj;
+    }
+
+    public function daLiJePozoristeSlobodno($igranje)
+    {
+        if ($igranje->scenaid == null) {
+            $test = Igranje::where('pozoristeid', $igranje->pozoristeid)->where('datum', '=', $igranje->datum)->where('vreme', '=', $igranje->vreme)->exists();
+        } else {
+            $test = Igranje::where('scenaid', $igranje->scenaid)->where('datum', '=', $igranje->datum)->where('vreme', '=', $igranje->vreme)->exists();
+        }
+        return !$test;
+    }
+
+    public function daLiSePredstavaVecIgraNegde($igranje)
+    {
+        $test = Igranje::where('predstavaid', $igranje->predstavaid)->where('datum', '=', $igranje->datum)->where('vreme', '=', $igranje->vreme)->exists();
+        return !$test;
     }
 }

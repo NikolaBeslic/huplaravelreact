@@ -47,8 +47,9 @@ class ZanroviController extends Controller
         try {
             $request->validate([
                 'naziv_zanra' => 'required',
-                'zanr_slug' => 'required',
+                'zanr_slug' => 'required|unique:zanr,zanr_slug',
                 'zanr_boja' => 'required',
+                'zanr_mnozina' => 'required'
             ]);
         } catch (ValidationException $e) {
             return response()->json($e, 422);
