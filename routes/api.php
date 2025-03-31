@@ -17,6 +17,7 @@ use App\Http\Controllers\KategorijeController;
 use App\Http\Controllers\KorisniciController;
 use App\Http\Controllers\TagoviController;
 use App\Http\Controllers\ZanroviController;
+use App\Http\Controllers\GoogleAnalyticsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -135,6 +136,10 @@ Route::post("/admin/store-grad", [PozoristaController::class, 'gradStore']);
 /* Google Analytics */
 Route::get('/auth/google/redirect', [GoogleController::class, 'redirect']);
 Route::get('/auth/google/callback', [GoogleController::class, 'callback']);
+Route::get('/admin/get-fetches', [GoogleAnalyticsController::class, 'getFetches']);
+Route::get('/admin/get-ga-monthly-data', [GoogleAnalyticsController::class, 'getMonthlyData']);
+Route::get('/admin/get-fetch-details/{fetchId}', [GoogleAnalyticsController::class, 'getFetchDetails']);
+Route::get('/admin/get-total-visits-period', [GoogleAnalyticsController::class, 'getTotalVisitsForPeriod']);
 
 Route::middleware('auth:sanctum')->post('/predstava/oceni', [PredstaveController::class, 'oceni']);
 Route::middleware('auth:sanctum')->post('/predstava/dodajNaListuZelja', [PredstaveController::class, 'dodajNaListuZelja']);
