@@ -129,7 +129,11 @@ Route::get('/admin/pozoriste-with-predstave/{pozoriste_slug}', [PozoristaControl
 Route::get('/admin/get-igranja-pozorista/{pozoristeid}', [RepertoariController::class, 'getIgranjaPozorista']);
 Route::post('/admin/igranje-store', [RepertoariController::class, 'igranjeStore']);
 Route::get('/admin/get-all-for-gostovanja', [RepertoariController::class, 'getAllForGostovanja']);
-
+/* Admin Festivali */
+Route::get('/admin/get-all-festivali', [FestivaliController::class, 'adminGetAllFestivali']);
+Route::post('/admin/festival-store', [FestivaliController::class, 'store']);
+Route::put('/admin/festival-update', [FestivaliController::class, 'update']);
+Route::get('/admin/get-single-festival/{festivalid}', [FestivaliController::class, 'getSingleFestivalAdmin']);
 /* Admin Grad */
 Route::post("/admin/store-grad", [PozoristaController::class, 'gradStore']);
 
