@@ -37,4 +37,15 @@ class TagoviController extends Controller
         if (Tag::insert($request->all()))
             return response()->json([], 200);
     }
+
+    public function getTekstsByTag($tag_slug)
+    {
+        $tekstovi = Tag::where('tag_slug', $tag_slug)->with([
+            'tekstovi' => function ($query) {
+                $query->select('tekst.tekstid', 'kategorijaid', 'naslov', 'slug', 'tekst_photo', 'uvod');
+            },
+            'tekstovi.kategorija'
+        ])->firstOrFail();
+        return json_encode($tekstovi);
+    }
 }
