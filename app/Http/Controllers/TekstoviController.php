@@ -195,7 +195,7 @@ class TekstoviController extends Controller
 
     public function getCategoryPosts($kategorija_slug)
     {
-        $kategorija = Kategorija::where('kategorija_slug', $kategorija_slug)->with('tekstovi')->firstOrFail();
+        $kategorija = Kategorija::where('kategorija_slug', $kategorija_slug)->firstOrFail();
         $katIds = $this->getAllKategIds($kategorija);
         $tekstovi = Tekst::whereIn('kategorijaid', $katIds)->where('is_published', 1)->with(['kategorija'])->orderBy('published_at', 'desc')->paginate(8);
         $kategorija->setRelation('tekstovi', $tekstovi);
@@ -589,10 +589,10 @@ class TekstoviController extends Controller
         $hupkast = Tekst::where('slug', $hupkast_slug)->where('is_published', 1)->with('hupkast.linkovi')->with('autori')->firstOrFail();
         return json_encode($hupkast);
     }
-
+    /* Pagination added consider change method */
     public function getAllHupikon()
     {
-        $hupikons = Tekst::where('kategorijaid', 5)->where('is_published', 1)->with('hupikon')->orderBy('published_at', 'desc')->get();
+        $hupikons = Tekst::where('kategorijaid', 5)->where('is_published', 1)->with('hupikon')->orderBy('published_at', 'desc')->paginate(12);
         return json_encode($hupikons);
     }
 
