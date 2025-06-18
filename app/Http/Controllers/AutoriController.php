@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Autor;
 use App\Http\Resources\AutorResource;
+use App\Models\Tekst;
 use Dotenv\Exception\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -14,29 +15,34 @@ class AutoriController extends Controller
     public function getAutori()
     {
         $autori = Autor::where('status_autora', 1)->orderBy('ime_autora')->get();
-        return AutorResource::collection($autori);
+
+        return json_encode($autori);
     }
 
     public function getSingleAutor($autor_slug)
     {
         $autor = Autor::where('autor_slug', $autor_slug)
             ->with('grad')
-            ->with([
-                'tekstovi' => function ($query) {
-                    $query->select('tekst.tekstid', 'naslov', 'slug', 'uvod', 'tekst_thumbnail', 'tekst_photo', 'published_at', 'created_at', 'kategorijaid')
-                        ->with(
-                            'kategorija'
-                        )->orderBy('published_at', 'desc')->paginate(10);
-                }
-            ])
             ->firstOrFail();
+
+        $tekstovi = $autor->tekstovi()
+            ->select('tekst.tekstid', 'naslov', 'slug', 'uvod', 'tekst_photo', 'tekst.kategorijaid', 'published_at')
+            ->with('kategorija')
+            ->where('is_published', 1)
+            ->orderBy('published_at', 'desc')
+            ->paginate(12);
+
+
+        $autor->setRelation('tekstovi', $tekstovi);
         return json_encode($autor);
     }
 
     public function getAllAutori()
     {
-        return json_encode(Autor::where('status_autora', 1)->get());
+        $autori = Autor::where('status_autora', 1)->get();
+        return json_encode($autori);
     }
+
     public function getSingleAutorAdmin($autorid)
     {
         return json_encode(Autor::where('autorid', $autorid)->firstOrFail());

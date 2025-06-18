@@ -11,7 +11,12 @@ class FestivaliController extends Controller
     //
     public function getFestivali()
     {
-        return json_encode(Festival::with('grad')->orderBy('datumod', 'desc')->take(30)->get());
+
+        $festivali = Festival::select('festivalid', 'gradid', 'naziv_festivala', 'festival_slug', 'festival_slika', 'datumod', 'datumdo')
+            ->with('grad')
+            ->orderBy('datumod', 'desc')
+            ->paginate(12);
+        return json_encode($festivali);
     }
 
     public function getAllFestivali()
@@ -35,7 +40,7 @@ class FestivaliController extends Controller
 
     public function adminGetAllFestivali()
     {
-        $festivali = Festival::select('festivalid', 'gradid', 'naziv_festivala', 'datumod', 'datumdo')
+        $festivali = Festival::select('festivalid', 'gradid', 'naziv_festivala',  'datumod', 'datumdo')
             ->with('grad')
             ->orderBy('datumod', 'desc')
             ->get();

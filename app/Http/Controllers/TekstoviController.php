@@ -580,7 +580,15 @@ class TekstoviController extends Controller
 
     public function getAllHuPkast()
     {
-        $hupkast = Tekst::where('kategorijaid', 11)->where('is_published', 1)->orderBy('published_at', 'desc')->get();
+        $hupkast = Kategorija::where('kategorijaid', 11)
+            ->with(['tekstovi' => function ($query) {
+                $query
+                    ->select('tekstid', 'naslov', 'slug', 'uvod', 'tekst_photo', 'kategorijaid', 'published_at')
+                    ->where('is_published', 1)
+                    ->orderBy('published_at', 'desc')
+                    ->paginate(12);
+            }])
+            ->firstOrFail();
         return json_encode($hupkast);
     }
 
@@ -592,8 +600,17 @@ class TekstoviController extends Controller
     /* Pagination added consider change method */
     public function getAllHupikon()
     {
-        $hupikons = Tekst::where('kategorijaid', 5)->where('is_published', 1)->with('hupikon')->orderBy('published_at', 'desc')->paginate(12);
-        return json_encode($hupikons);
+        $hupikon = Kategorija::where('kategorijaid', 5)
+            ->with(['tekstovi' => function ($query) {
+                $query
+                    ->select('tekstid', 'naslov', 'slug', 'uvod', 'tekst_photo', 'kategorijaid', 'published_at')
+                    ->where('is_published', 1)
+                    ->with('hupikon')
+                    ->orderBy('published_at', 'desc')
+                    ->paginate(12);
+            }])
+            ->firstOrFail();
+        return json_encode($hupikon);
     }
 
     public function adminGetTekstoviZaNaslovnu()
