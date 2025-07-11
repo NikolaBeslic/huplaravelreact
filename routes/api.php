@@ -149,6 +149,7 @@ Route::get('/admin/get-total-visits-period', [GoogleAnalyticsController::class, 
 Route::middleware('auth:sanctum')->post('/predstava/oceni', [PredstaveController::class, 'oceni']);
 Route::middleware('auth:sanctum')->post('/predstava/dodajNaListuZelja', [PredstaveController::class, 'dodajNaListuZelja']);
 Route::middleware('auth:sanctum')->post('/predstava/dodajUOdgledane', [PredstaveController::class, 'dodajUOdgledane']);
+Route::middleware('auth:sanctum')->post('/predstava/dodaj-komentar', [PredstaveController::class, 'dodajKomentar']);
 Route::middleware('auth:sanctum')->post('/pozorista/dodajUOmiljena', [PozoristaController::class, 'dodajUOmiljena']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

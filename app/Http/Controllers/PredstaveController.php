@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\PredstavaResource;
 use App\Models\Grad;
+use App\Models\Komentar;
 use Illuminate\Http\Request;
 use App\Models\Predstava;
 use App\Models\Zanr;
@@ -248,6 +249,26 @@ class PredstaveController extends Controller
                 $predstava->naListiZelja()->attach($korisnik, ['statuszeljeid' => 2]);
             }
 
+            return response()->json();
+        } catch (Exception $e) {
+            return response()->json($e->getMessage(), 500);
+        }
+    }
+
+    public function dodajKomentar(Request $request)
+    {
+        $predstava = Predstava::find($request->predstavaid);
+        $korisnik = auth('sanctum')->user();
+        $komentar = new Komentar();
+        $komentar->predstavaid = $predstava->predstavaid;
+        $komentar->korisnikid = $korisnik->id;
+        $komentar->tekst_komentara = $request->tekst_komentara;
+
+        $request->validate([
+            'tekst_komentara' => 'required|max:1000'
+        ]);
+        try {
+            $komentar->save();
             return response()->json();
         } catch (Exception $e) {
             return response()->json($e->getMessage(), 500);
