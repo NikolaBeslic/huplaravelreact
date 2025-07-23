@@ -580,15 +580,14 @@ class TekstoviController extends Controller
 
     public function getAllHuPkast()
     {
-        $hupkast = Kategorija::where('kategorijaid', 11)
-            ->with(['tekstovi' => function ($query) {
-                $query
-                    ->select('tekstid', 'naslov', 'slug', 'uvod', 'tekst_photo', 'kategorijaid', 'published_at')
-                    ->where('is_published', 1)
-                    ->orderBy('published_at', 'desc')
-                    ->paginate(12);
-            }])
-            ->firstOrFail();
+        $hupkast = Kategorija::where('kategorijaid', 11)->firstOrFail();
+
+        $tekstovi = Tekst::select('tekstid', 'naslov', 'slug', 'uvod', 'tekst_photo', 'kategorijaid', 'published_at')
+            ->where(['kategorijaid' => 11, 'is_published' => 1])
+            ->with(['kategorija'])
+            ->orderBy('published_at', 'desc')
+            ->paginate(10);
+        $hupkast->setRelation('tekstovi', $tekstovi);
         return json_encode($hupkast);
     }
 
