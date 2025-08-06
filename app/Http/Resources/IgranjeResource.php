@@ -15,6 +15,7 @@ class IgranjeResource extends JsonResource
     public function toArray($request)
     {
         return [
+            'seigraid' => $this->seigraid,
             'datum' => $this->datum,
             'vreme' => $this->vreme,
             'scena' => new ScenaResource($this->scena),
