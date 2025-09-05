@@ -31,6 +31,7 @@ use App\Http\Controllers\GoogleAnalyticsController;
 */
 
 Route::get('/search', [TekstoviController::class, 'search']);
+Route::get('/pretraga', [TekstoviController::class, 'searchAll']);
 Route::get('/get-trending-posts', [TekstoviController::class, 'getTrendingPosts']);
 Route::get('/get-slider-posts', [TekstoviController::class, 'getSliderPosts']);
 Route::get('/get-posts', [TekstoviController::class, 'getPosts']);

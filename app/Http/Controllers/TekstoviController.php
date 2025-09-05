@@ -12,10 +12,12 @@ use App\Models\Pozoriste;
 use App\Models\Tekst;
 use App\Models\Hupikon;
 use App\Models\Hupkast;
+use App\Models\Predstava;
 use Dotenv\Exception\ValidationException;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException as ValidationValidationException;
 use JsonSerializable;
 use stdClass;
@@ -46,7 +48,80 @@ class TekstoviController extends Controller
     public function search(Request $request)
     {
         $inputSearch = $request['inputSearch'];
-        $result = Tekst::whereRaw("MATCH(naslov, sadrzaj) AGAINST(? IN BOOLEAN MODE)", [$inputSearch])->with('kategorija')->get();
+
+        $predstaveResult = Predstava::select(
+            DB::raw(
+                "'predstava' AS kategorija,
+                'predstava' AS kategorija_slug,
+                '#03532dff' AS boja,
+                MATCH(naziv_predstave, opis, uloge) AGAINST('" . $inputSearch . "' IN BOOLEAN MODE) as relevance",
+            ),
+            'predstavaid AS id',
+            'naziv_predstave AS naslov',
+            'predstava_slug AS slug',
+            'plakat AS photo',
+            'premijera AS datum'
+        )
+            ->whereRaw(
+                "MATCH(naziv_predstave, opis, uloge) AGAINST(? IN BOOLEAN MODE)",
+                [$inputSearch]
+            )
+            ->take(10);
+
+        $tekstoviResult = Tekst::select([
+            'kategorija.naziv_kategorije as kategorija',
+            'kategorija.kategorija_slug AS kategorija_slug',
+            'kategorija.kategorija_boja AS boja',
+            DB::raw("MATCH(naslov, sadrzaj) AGAINST('" . $inputSearch . "' IN BOOLEAN MODE) as relevance"),
+            'tekstid AS id',
+            'naslov AS naslov',
+            'slug AS slug',
+            'tekst_photo AS photo',
+            'published_at AS datum'
+        ])->join('kategorija', 'kategorija.kategorijaid', '=', 'tekst.kategorijaid')
+            ->whereRaw("MATCH(naslov, sadrzaj) AGAINST(? IN BOOLEAN MODE)", [$inputSearch])
+            ->take(10);
+        $result = $tekstoviResult->union($predstaveResult)->orderBy('relevance', 'desc')->get();
+        return json_encode($result);
+    }
+
+    public function searchAll(Request $request)
+    {
+        $inputSearch = $request['query'];
+
+        $predstaveResult = Predstava::select(
+            DB::raw(
+                "'predstava' AS kategorija,
+                'predstave' AS kategorija_slug,
+                '#03532dff' AS boja,
+                MATCH(naziv_predstave, opis, uloge) AGAINST('" . $inputSearch . "' IN BOOLEAN MODE) as relevance",
+            ),
+            'predstavaid AS id',
+            'naziv_predstave AS naslov',
+            'predstava_slug AS slug',
+            'plakat AS photo',
+            'premijera AS datum'
+        )
+            ->whereRaw(
+                "MATCH(naziv_predstave, opis, uloge) AGAINST(? IN BOOLEAN MODE)",
+                [$inputSearch]
+            )
+            ->take(50);
+
+        $tekstoviResult = Tekst::select([
+            'kategorija.naziv_kategorije as kategorija',
+            'kategorija.kategorija_slug AS kategorija_slug',
+            'kategorija.kategorija_boja AS boja',
+            DB::raw("MATCH(naslov, sadrzaj) AGAINST('" . $inputSearch . "' IN BOOLEAN MODE) as relevance"),
+            'tekstid AS id',
+            'naslov AS naslov',
+            'slug AS slug',
+            'tekst_photo AS photo',
+            'published_at AS datum'
+        ])->join('kategorija', 'kategorija.kategorijaid', '=', 'tekst.kategorijaid')
+            ->whereRaw("MATCH(naslov, sadrzaj) AGAINST(? IN BOOLEAN MODE)", [$inputSearch])
+            ->take(50);
+        $result = $tekstoviResult->union($predstaveResult)->orderBy('relevance', 'desc')->paginate(10);
         return json_encode($result);
     }
 
