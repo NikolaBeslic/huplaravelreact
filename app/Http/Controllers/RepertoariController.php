@@ -77,6 +77,57 @@ class RepertoariController extends Controller
         return response()->json('greska prilikom cuvanja izvodjenja', 500);
     }
 
+    public function igranjeUpdate(Request $request)
+    {
+
+        try {
+            $request->validate([
+                'seigraid' => 'required',
+                'pozoristeid' => 'required',
+                'vreme' => 'required|',
+                'datum' => 'required|date',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json($e, 422);
+        }
+
+        $igranje = Igranje::find($request->seigraid);
+        if (!$igranje) {
+            return response()->json('Ne postoji izvodjenje sa ovim ID', 500);
+        }
+
+        $igranje->fill($request->all());
+
+        /* if (!$this->daLiJePozoristeSlobodno($igranje))
+            return response()->json('Pozoriste je zauzeto u ovom terminu', 500);
+
+        if (!$this->daLiSePredstavaVecIgraNegde($igranje))
+            return response()->json('Predstava se vec igra negde u ovom terminu', 500); */
+
+        if ($igranje->save()) {
+            if ($request->gostovanje) {
+                $igranjaPozorista = $this->fetchSvaIgranjaFromDb();
+            } else {
+                $igranjaPozorista = $this->fetchIgranjaFromDb($request->pozoristeid);
+            }
+            return response()->json($igranjaPozorista);
+        }
+    }
+
+    public function igranjeDelete($id)
+    {
+        $igranje = Igranje::find($id);
+        if (!$igranje) {
+            return response()->json('Ne postoji izvodjenje sa ovim ID', 500);
+        }
+        // $pozoristeid = $igranje->pozoristeid;
+        if ($igranje->delete()) {
+            //$igranjaPozorista = $this->fetchIgranjaFromDb($pozoristeid);
+            return response()->json();
+        }
+        return response()->json('Greska prilikom brisanja izvodjenja', 500);
+    }
+
     public function getIgranjaPozorista($pozoristeid)
     {
         $igranja = $this->fetchIgranjaFromDb($pozoristeid);

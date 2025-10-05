@@ -7,6 +7,8 @@ use App\Models\Autor;
 use App\Models\Festival;
 use App\Http\Resources\KategorijaResource;
 use App\Http\Resources\TekstResource;
+use App\Models\GaFetch;
+use App\Models\GaFetchDetails;
 use App\Models\Kategorija;
 use App\Models\Pozoriste;
 use App\Models\Tekst;
@@ -129,6 +131,24 @@ class TekstoviController extends Controller
     {
         $tekstovi = Tekst::with(['kategorija'])->inRandomOrder()->take(6)->get();
         return json_encode($tekstovi);
+    }
+
+    public function getSidebarPosts()
+    {
+
+        $najnoviji = Tekst::where(['is_published' => 1, 'is_deleted' => 0])->with('kategorija')->orderBy('published_at', 'desc')->take(5)->get();
+        $najcitaniji = $this->getNajcitanijeTekstove();
+        $result = $najcitaniji->union($najnoviji);
+        return json_encode($result);
+    }
+
+    public function getNajcitanijeTekstove()
+    {
+        $latestFetch = GaFetch::where('type_id', 6)->orderBy('updated_at', 'desc')->first();
+        $fetchDetails = GaFetchDetails::where('fetch_id', $latestFetch->fetch_id)->orderBy('views', 'desc')->take(7)->get();
+        $slugs = $fetchDetails->pluck('url');
+        $tekstovi = Tekst::whereIn('slug', $slugs)->get();
+        return $tekstovi;
     }
 
     public function getRelatedPosts($tekstid)

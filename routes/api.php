@@ -32,7 +32,7 @@ use App\Http\Controllers\GoogleAnalyticsController;
 
 Route::get('/search', [TekstoviController::class, 'search']);
 Route::get('/pretraga', [TekstoviController::class, 'searchAll']);
-Route::get('/get-trending-posts', [TekstoviController::class, 'getTrendingPosts']);
+Route::get('/get-trending-posts', [TekstoviController::class, 'getSidebarPosts']);
 Route::get('/get-slider-posts', [TekstoviController::class, 'getSliderPosts']);
 Route::get('/get-posts', [TekstoviController::class, 'getPosts']);
 Route::get('/get-category-posts/{katergorija_slug}', [TekstoviController::class, 'getCategoryPosts']);
@@ -130,6 +130,8 @@ Route::post('/admin/hupikon-store', [TekstoviController::class, 'hupikonStore'])
 Route::get('/admin/pozoriste-with-predstave/{pozoriste_slug}', [PozoristaController::class, 'getPozoristeWithPredstave']);
 Route::get('/admin/get-igranja-pozorista/{pozoristeid}', [RepertoariController::class, 'getIgranjaPozorista']);
 Route::post('/admin/igranje-store', [RepertoariController::class, 'igranjeStore']);
+Route::put('/admin/igranje-update', [RepertoariController::class, 'igranjeUpdate']);
+Route::delete('/admin/igranje-delete/{id}', [RepertoariController::class, 'igranjeDelete']);
 Route::get('/admin/get-all-for-gostovanja', [RepertoariController::class, 'getAllForGostovanja']);
 /* Admin Festivali */
 Route::get('/admin/get-all-festivali', [FestivaliController::class, 'adminGetAllFestivali']);
