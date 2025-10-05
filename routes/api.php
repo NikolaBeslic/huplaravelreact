@@ -18,6 +18,7 @@ use App\Http\Controllers\KorisniciController;
 use App\Http\Controllers\TagoviController;
 use App\Http\Controllers\ZanroviController;
 use App\Http\Controllers\GoogleAnalyticsController;
+use App\Http\Controllers\KomentariController;
 
 /*
 |--------------------------------------------------------------------------
@@ -140,6 +141,11 @@ Route::put('/admin/festival-update', [FestivaliController::class, 'update']);
 Route::get('/admin/get-single-festival/{festivalid}', [FestivaliController::class, 'getSingleFestivalAdmin']);
 /* Admin Grad */
 Route::post("/admin/store-grad", [PozoristaController::class, 'gradStore']);
+
+/* Admin Komentari */
+Route::get("/admin/get-all-komentari", [KomentariController::class, 'getAllKomentari']);
+Route::put('/admin/odobri-komentar/{komentarid}', [KomentariController::class, 'odobriKomentar']);
+Route::delete('/admin/komentar-delete/{komentarid}', [KomentariController::class, 'deleteKomentar']);
 
 /* Google Analytics */
 Route::get('/auth/google/redirect', [GoogleController::class, 'redirect']);

@@ -11,7 +11,7 @@ class Komentar extends Model
     protected $table = 'komentar';
     protected $primaryKey = 'komentarid';
 
-    public function predstave()
+    public function predstava()
     {
         return $this->belongsTo(Predstava::class, 'predstavaid');
     }
