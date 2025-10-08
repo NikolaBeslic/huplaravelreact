@@ -158,7 +158,15 @@ class PredstaveController extends Controller
 
     public function getAllPredstaveAdmin()
     {
-        return json_encode(Predstava::with('pozorista')->get());
+        $predstave = Predstava::select('predstavaid', 'naziv_predstave', 'predstava_slug', 'premijera', 'created_at')
+            ->with([
+                'pozorista' => function ($query) {
+                    $query->select('pozoriste.pozoristeid', 'pozoriste_slug', 'naziv_pozorista');
+                }
+            ])
+            ->orderBy('naziv_predstave', 'desc')
+            ->get();
+        return json_encode($predstave);
     }
 
     public function getSinglePredstavaById($predstavaid)
