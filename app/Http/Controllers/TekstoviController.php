@@ -546,12 +546,12 @@ class TekstoviController extends Controller
 
     public function update2(Request $request)
     {
-
         // 
         try {
             $request->validate([
                 'naslov' => 'required',
                 'slug' => 'required',
+                'slika' => 'required',
                 'uvod' => 'required|max:280 ',
             ]);
         } catch (ValidationException $e) {
@@ -561,6 +561,16 @@ class TekstoviController extends Controller
         $tekst =  Tekst::where('tekstid', $request->tekstid)->with('hupkast.linkovi')->firstOrFail();
 
         $tekst->fill($request->all());
+        if ($request->file('slika')) {
+            if ($request->kategorijaid) {
+                $kategorija_slug = Kategorija::where('kategorijaid', $request->kategorijaid)->value('kategorija_slug');
+            }
+            $fileExtension = $request->file('slika')->extension();
+            $fileName = $request->slug . '.' . $fileExtension;
+            $path = $request->file('slika')->move(base_path() . '/react/public/slike/' . $kategorija_slug, $fileName);
+            $tekst->tekst_photo = '/slike/' . $kategorija_slug . '/' . $fileName;
+        }
+
         if ($tekst->save()) {
             $tekst->predstave()->sync($request->predstave);
             $tekst->tagovi()->sync($request->tagovi);
@@ -585,7 +595,6 @@ class TekstoviController extends Controller
                 $hupikon->fill($request->all());
                 $hupikon->save();
             }
-
 
             return response()->json([], 200);
         }
