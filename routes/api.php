@@ -104,7 +104,7 @@ Route::get('/admin/get-all-autori', [AutoriController::class, 'getAllAutori']);
 Route::get('/admin/get-single-autor/{autorid}', [AutoriController::class, 'getSingleAutorAdmin']);
 Route::get('/admin/get-gradovi', [PredstaveController::class, 'getGradovi']);
 Route::post('/admin/create-autor', [AutoriController::class, 'store']);
-Route::put('/admin/update-autor', [AutoriController::class, 'update']);
+Route::post('/admin/update-autor', [AutoriController::class, 'update']);
 /* Admin pozorista */
 Route::get('/admin/get-all-pozorista', [PozoristaController::class, 'getAllPozorista']);
 Route::get('/admin/get-single-pozoriste/{pozoristeid}', [PozoristaController::class, 'getSinglePozoristeAdmin']);

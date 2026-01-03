@@ -79,13 +79,21 @@ class AutoriController extends Controller
         try {
             $request->validate([
                 'ime_autora' => 'required',
-
                 'pozicija' => 'required',
             ]);
         } catch (ValidationException $e) {
             return response()->json($e, 422);
         }
+
         $autor = $autor->fill($request->all());
+
+        if ($request->file('slika')) {
+            $fileExtension = $request->file('slika')->extension();
+            $fileName = $request->autor_slug . '.' . $fileExtension;
+            $path = $request->file('slika')->move(base_path() . '/react/public/slike/autori', $fileName);
+            $autor->url_slike = '/slike/autori/' . $fileName;
+        }
+
         if ($autor->save())
             return response()->json([], 200);
     }
