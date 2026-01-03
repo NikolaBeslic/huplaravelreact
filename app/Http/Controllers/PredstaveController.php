@@ -187,6 +187,13 @@ class PredstaveController extends Controller
         }
 
         $predstava = new Predstava($request->all());
+        if ($request->file('slika')) {
+            $fileExtension = $request->file('slika')->extension();
+            $fileName = $request->predstava_slug . '.' . $fileExtension;
+            $path = $request->file('slika')->move(base_path() . '/react/public/slike/predstave', $fileName);
+            $predstava->plakat = '/slike/predstave/' . $fileName;
+        }
+
         if ($predstava->save()) {
             $predstava->pozorista()->attach($request->pozorista);
             return response()->json([], 200);
@@ -207,6 +214,14 @@ class PredstaveController extends Controller
         }
 
         $predstava->fill($request->all());
+
+        if ($request->file('slika')) {
+            $fileExtension = $request->file('slika')->extension();
+            $fileName = $request->predstava_slug . '.' . $fileExtension;
+            $path = $request->file('slika')->move(base_path() . '/react/public/slike/predstave', $fileName);
+            $predstava->plakat = '/slike/predstave/' . $fileName;
+        }
+
         if ($predstava->save()) {
             $predstava->pozorista()->sync($request->pozorista);
             return response()->json([], 200);

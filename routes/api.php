@@ -114,7 +114,7 @@ Route::post('/admin/create-pozoriste', [PozoristaController::class, 'store']);
 Route::get('/admin/get-all-predstave', [PredstaveController::class, 'getAllPredstaveAdmin']);
 Route::get('/admin/get-single-predstava/{predstavaid}', [PredstaveController::class, 'getSinglePredstavaById']);
 Route::post('/admin/create-predstava', [PredstaveController::class, 'store']);
-Route::put('/admin/update-predstava', [PredstaveController::class, 'update']);
+Route::post('/admin/update-predstava', [PredstaveController::class, 'update']);
 
 /* Admin HuPkast */
 Route::get('/admin/check-hupkast-rss', [HuPkastController::class, 'checkHuPkastRSS']);
