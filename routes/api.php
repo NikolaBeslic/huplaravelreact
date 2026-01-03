@@ -137,7 +137,7 @@ Route::get('/admin/get-all-for-gostovanja', [RepertoariController::class, 'getAl
 /* Admin Festivali */
 Route::get('/admin/get-all-festivali', [FestivaliController::class, 'adminGetAllFestivali']);
 Route::post('/admin/festival-store', [FestivaliController::class, 'store']);
-Route::put('/admin/festival-update', [FestivaliController::class, 'update']);
+Route::post('/admin/festival-update', [FestivaliController::class, 'update']);
 Route::get('/admin/get-single-festival/{festivalid}', [FestivaliController::class, 'getSingleFestivalAdmin']);
 /* Admin Grad */
 Route::post("/admin/store-grad", [PozoristaController::class, 'gradStore']);

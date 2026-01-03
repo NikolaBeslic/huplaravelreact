@@ -97,12 +97,12 @@ class FestivaliController extends Controller
 
         $festival = Festival::where('festivalid', $request->festivalid)->firstOrFail();
         $festival = $festival->fill($request->all());
-        /* if ($request->file('festival_slika')) {
+        if ($request->file('festival_slika')) {
             $fileExtension = $request->file('festival_slika')->extension();
             $fileName = $request->festival_slug . '.' . $fileExtension;
             $path = $request->file('festival_slika')->move(base_path() . '/react/public/slike/festivali', $fileName);
             $festival->festival_slika = '/slike/festivali/' . $fileName;
-        } */
+        }
         if ($festival->save())
             return response()->json([], 200);
     }
