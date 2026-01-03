@@ -444,9 +444,9 @@ class TekstoviController extends Controller
 
     public function adminindex()
     {
-        $tekstovi = Tekst::select('tekstid', 'naslov', 'slug', 'kategorijaid', 'is_published', 'is_deleted', 'na_slajderu', 'created_at')
+        $tekstovi = Tekst::select('tekstid', 'naslov', 'slug', 'kategorijaid', 'is_published', 'is_deleted', 'na_slajderu', 'created_at', 'published_at')
             ->with('kategorija')
-            ->orderBy('created_at', 'desc')
+            ->orderBy('published_at', 'desc')
             ->get();
 
         return json_encode($tekstovi);
