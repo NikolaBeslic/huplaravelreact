@@ -19,6 +19,7 @@ use App\Http\Controllers\TagoviController;
 use App\Http\Controllers\ZanroviController;
 use App\Http\Controllers\GoogleAnalyticsController;
 use App\Http\Controllers\KomentariController;
+use App\Http\Controllers\ScraperController;
 
 /*
 |--------------------------------------------------------------------------
@@ -134,6 +135,8 @@ Route::post('/admin/igranje-store', [RepertoariController::class, 'igranjeStore'
 Route::put('/admin/igranje-update', [RepertoariController::class, 'igranjeUpdate']);
 Route::delete('/admin/igranje-delete/{id}', [RepertoariController::class, 'igranjeDelete']);
 Route::get('/admin/get-all-for-gostovanja', [RepertoariController::class, 'getAllForGostovanja']);
+Route::post('/admin/igranje-multi-store', [RepertoariController::class, 'igranjeMultiStore']);
+
 /* Admin Festivali */
 Route::get('/admin/get-all-festivali', [FestivaliController::class, 'adminGetAllFestivali']);
 Route::post('/admin/festival-store', [FestivaliController::class, 'store']);
@@ -154,6 +157,11 @@ Route::get('/admin/get-fetches', [GoogleAnalyticsController::class, 'getFetches'
 Route::get('/admin/get-ga-monthly-data', [GoogleAnalyticsController::class, 'getMonthlyData']);
 Route::get('/admin/get-fetch-details/{fetchId}', [GoogleAnalyticsController::class, 'getFetchDetails']);
 Route::get('/admin/get-total-visits-period', [GoogleAnalyticsController::class, 'getTotalVisitsForPeriod']);
+
+/* Scraping */
+Route::get('/admin/getAtelje212', [ScraperController::class, 'getAtelje212']);
+Route::get('/admin/getNarodnoBeograd', [ScraperController::class, 'getNarodnoBeograd']);
+Route::get('/admin/repertoari/{pozoriste_slug}/scrape', [ScraperController::class, 'scrapeRepertoarPozorista']);
 
 Route::middleware('auth:sanctum')->post('/predstava/oceni', [PredstaveController::class, 'oceni']);
 Route::middleware('auth:sanctum')->post('/predstava/dodajNaListuZelja', [PredstaveController::class, 'dodajNaListuZelja']);

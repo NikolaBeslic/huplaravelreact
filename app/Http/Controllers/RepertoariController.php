@@ -77,6 +77,40 @@ class RepertoariController extends Controller
         return response()->json('greska prilikom cuvanja izvodjenja', 500);
     }
 
+    public function igranjeMultiStore(Request $request)
+    {
+        $igranjaData = $request['igranja'];
+
+        $savedIgranja = [];
+        $errors = [];
+
+        foreach ($igranjaData as $data) {
+            $igranje = new Igranje($data);
+
+            if (!$this->daLiJePozoristeSlobodno($igranje)) {
+                $errors[] = "Pozoriste je zauzeto za predstavu ID: {$data['predstavaid']} na datum {$data['datum']} u {$data['vreme']}";
+                continue;
+            }
+
+            if (!$this->daLiSePredstavaVecIgraNegde($igranje)) {
+                $errors[] = "Predstava ID: {$data['predstavaid']} se vec igra na datum {$data['datum']} u {$data['vreme']}";
+                continue;
+            }
+
+            if ($igranje->save()) {
+                $savedIgranja[] = $igranje;
+            } else {
+                $errors[] = "Greska prilikom cuvanja izvodjenja za predstavu ID: {$data['predstavaid']}";
+            }
+        }
+
+        $response = new stdClass();
+        $response->saved = $savedIgranja;
+        $response->errors = $errors;
+
+        return response()->json($response);
+    }
+
     public function igranjeUpdate(Request $request)
     {
 
