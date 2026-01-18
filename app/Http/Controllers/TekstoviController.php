@@ -609,6 +609,15 @@ class TekstoviController extends Controller
         }
     }
 
+    public function ukloniSaSlajdera(Request $request)
+    {
+        $tekst = Tekst::where('tekstid', $request->tekstid)->firstOrFail();
+        $tekst->na_slajderu = 0;
+        if ($tekst->save()) {
+            return response()->json(['na_slajderu' => $tekst->na_slajderu], 200);
+        }
+    }
+
     /**
      * Remove the specified resource from storage.
      *
@@ -720,8 +729,9 @@ class TekstoviController extends Controller
 
     public function adminGetTekstoviZaNaslovnu()
     {
-        $tekstovi = Tekst::with('kategorija')->orderBy('created_at', 'desc')->take(10)->get();
-        return json_encode($tekstovi);
+        $tekstovi = Tekst::with('kategorija')->orderBy('na_slajderu', 'desc')->orderBy('published_at', 'desc')->take(10)->get();
+        $result = $tekstovi->sortByDesc('published_at')->values();
+        return json_encode($result);
     }
 
     public function hupkastStore(Request $request)
