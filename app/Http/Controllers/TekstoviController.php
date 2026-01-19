@@ -774,4 +774,22 @@ class TekstoviController extends Controller
             return response()->json(["Error adding hupikon"], 500);
         }
     }
+
+    public function getAllComboboxData()
+    {
+        $pozorista = Pozoriste::select('pozoristeid', 'naziv_pozorista')->orderBy('naziv_pozorista')->get();
+        $autori = Autor::select('autorid', 'ime_autora')->where('status_autora', 1)->orderBy('ime_autora')->get();
+        $festivali = Festival::select('festivalid', 'naziv_festivala')->orderBy('datumod', 'desc')->get();
+        $predstave = Predstava::select('predstavaid', 'naziv_predstave')->orderBy('naziv_predstave')->get();
+        $tagovi = Tag::select('tagid', 'tag_naziv')->orderBy('tag_naziv')->get();
+
+        $result = new stdClass();
+        $result->pozorista = $pozorista;
+        $result->autori = $autori;
+        $result->festivali = $festivali;
+        $result->predstave = $predstave;
+        $result->tagovi = $tagovi;
+
+        return json_encode($result);
+    }
 }

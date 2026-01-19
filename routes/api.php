@@ -85,7 +85,7 @@ Route::get('/admin/tekstovi', [TekstoviController::class, 'adminindex']);
 Route::get('/get-tekst/{tekstid}', [TekstoviController::class, 'getTekstById']);
 Route::put('/admin/tekstovi/istakni', [TekstoviController::class, 'istakniTekst']);
 Route::put('/admin/tekstovi/ukloni-sa-slajdera', [TekstoviController::class, 'ukloniSaSlajdera']);
-
+Route::get('/admin/get-all-combobox-data', [TekstoviController::class, 'getAllComboboxData']);
 Route::post('/admin/update-tekst', [TekstoviController::class, 'update2']);
 Route::post('/admin/create-tekst', [TekstoviController::class, 'store2']);
 /* Admin kategorije */
