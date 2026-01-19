@@ -729,7 +729,7 @@ class TekstoviController extends Controller
 
     public function adminGetTekstoviZaNaslovnu()
     {
-        $tekstovi = Tekst::with('kategorija')->orderBy('na_slajderu', 'desc')->orderBy('published_at', 'desc')->take(10)->get();
+        $tekstovi = Tekst::select('tekstid', 'naslov', 'slug', 'tekst_photo', 'kategorijaid', 'na_slajderu', 'published_at')->orderBy('na_slajderu', 'desc')->orderBy('published_at', 'desc')->take(10)->get();
         $result = $tekstovi->sortByDesc('published_at')->values();
         return json_encode($result);
     }

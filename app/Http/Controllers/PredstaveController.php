@@ -230,7 +230,10 @@ class PredstaveController extends Controller
 
     public function adminGetPredstaveZaNaslovnu()
     {
-        $predstave = Predstava::with('pozorista')->orderBy('created_at', 'desc')->take(10)->get();
+        $predstave = Predstava::select('predstavaid', 'naziv_predstave', 'predstava_slug', 'premijera', 'created_at')
+            ->with(['pozorista' => function ($query) {
+                $query->select('pozoriste.pozoristeid', 'pozoriste_slug', 'naziv_pozorista');
+            }])->orderBy('created_at', 'desc')->take(10)->get();
         return json_encode($predstave);
     }
 
