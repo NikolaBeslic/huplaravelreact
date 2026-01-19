@@ -151,6 +151,7 @@ Route::post("/admin/store-grad", [PozoristaController::class, 'gradStore']);
 Route::get("/admin/get-all-komentari", [KomentariController::class, 'getAllKomentari']);
 Route::put('/admin/odobri-komentar/{komentarid}', [KomentariController::class, 'odobriKomentar']);
 Route::delete('/admin/komentar-delete/{komentarid}', [KomentariController::class, 'deleteKomentar']);
+Route::get('/admin/unapproved-comments-count', [KomentariController::class, 'getUnapprovedCommentsCount']);
 
 /* Google Analytics */
 Route::get('/auth/google/redirect', [GoogleController::class, 'redirect']);

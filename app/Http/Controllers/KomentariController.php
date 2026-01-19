@@ -35,8 +35,16 @@ class KomentariController extends Controller
             return response()->json(['message' => 'Komentar nije pronađen'], 404);
         }
 
-        $komentar->delete();
+        if ($komentar->delete()) {
+            $unnapprovedCommentsCount = Komentar::where('statuskomentaraid', 1)->count();
+        }
 
-        return response()->json(['message' => 'Komentar je uspešno obrisan']);
+        return response()->json(['message' => 'Komentar je uspešno obrisan', 'unnapprovedCommentsCount' => $unnapprovedCommentsCount ?? null]);
+    }
+
+    public function getUnapprovedCommentsCount()
+    {
+        $count = Komentar::where('statuskomentaraid', 1)->count();
+        return response()->json($count);
     }
 }
