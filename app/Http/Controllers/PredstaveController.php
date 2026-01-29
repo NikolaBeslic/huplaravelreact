@@ -171,7 +171,7 @@ class PredstaveController extends Controller
 
     public function getSinglePredstavaById($predstavaid)
     {
-        $predstava = Predstava::where('predstavaid', $predstavaid)->with('pozorista')->firstOrFail();
+        $predstava = Predstava::where('predstavaid', $predstavaid)->with('pozorista')->with('zanrovi')->firstOrFail();
         return json_encode($predstava);
     }
 

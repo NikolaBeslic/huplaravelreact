@@ -35,7 +35,8 @@ class TagoviController extends Controller
         // }
 
         if (Tag::insert($request->all()))
-            return response()->json([], 200);
+            $tagovi = Tag::withCount('tekstovi')->get();
+        return response()->json($tagovi, 200);
     }
 
     public function getTekstsByTag($tag_slug)
