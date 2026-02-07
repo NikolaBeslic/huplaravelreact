@@ -44,6 +44,7 @@ Route::get('/get-related-posts/{tekstid}', [TekstoviController::class, 'getRelat
 // Predstave
 Route::get('/get-predstave', [PredstaveController::class, 'getPredstave']);
 Route::get('/get-premijere', [PredstaveController::class, 'getPremijere']);
+Route::get('/get-danas-na-repertoaru', [RepertoariController::class, 'getDanasNaRepertoaru']);
 Route::get('/get-najnovije-predstave', [PredstaveController::class, 'getNajpopularnijePredstave']);
 Route::get('/get-predstave-naslovna', [PredstaveController::class, 'getPredstaveZaNaslovnu']);
 Route::get('/get-all-predstave', [PredstaveController::class, 'getAllPredstave']);

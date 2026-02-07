@@ -16,9 +16,10 @@ use Illuminate\Support\Str;
 
 class GoogleAnalyticsController extends Controller
 {
+    /* Showing data alreadz existing in database*/
     public function getFetches()
     {
-        $fetches = GaFetch::with('fetchType')->with('fetchDetails')->get();
+        $fetches = GaFetch::with('fetchType')->withCount('fetchDetails')->orderByDesc('fetch_id')->get();
         return json_encode($fetches);
     }
 

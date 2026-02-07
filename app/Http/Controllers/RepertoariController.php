@@ -43,6 +43,32 @@ class RepertoariController extends Controller
         return json_encode($igranja);
     }
 
+
+    public function getDanasNaRepertoaru()
+    {
+        $igranja = Igranje::query()
+            ->select([
+                'seigraid',
+                'datum',
+                'vreme',
+                'pozoristeid',
+                'predstavaid',
+                'scenaid',
+            ])
+            ->whereDate('datum', '2019-09-20')
+            ->orderBy('datum')
+            ->orderBy('vreme')
+            ->limit(10)
+            ->with([
+                'pozoriste:pozoristeid,naziv_pozorista,pozoriste_slug,gradid',
+                'scena:scenaid,naziv_scene',
+                'predstava:predstavaid,naziv_predstave,predstava_slug,plakat',
+                'predstava.zanrovi:zanrid,naziv_zanra,zanr_slug',
+            ])
+            ->get();
+        return json_encode($igranja);
+    }
+
     public function igranjeStore(Request $request)
     {
 

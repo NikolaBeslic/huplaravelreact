@@ -137,10 +137,13 @@ class PredstaveController extends Controller
 
     public function getPremijere()
     {
-        $premijere = Predstava::where('premijera', '>', date('2024-06-01'))
+        $premijere = Predstava::select('predstavaid', 'naziv_predstave', 'predstava_slug', 'premijera', 'plakat')
+            ->where('premijera', '>', date('2024-06-01'))
             ->whereNotNull('plakat')
             ->orderBy('premijera', 'asc')
-            ->with('pozorista')
+            ->with(['pozorista' => function ($query) {
+                $query->select('pozoriste.pozoristeid', 'pozoriste_slug', 'naziv_pozorista');
+            }])
             ->take(5)
             ->get();
         return json_encode($premijere);
