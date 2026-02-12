@@ -242,7 +242,7 @@ class PredstaveController extends Controller
 
     public function oceni(Request $request)
     {
-        $korisnik = $request->user();
+        $korisnik = auth('sanctum')->user();
         $predstava = Predstava::find($request->predstavaid);
         $ocena = new Ocena(['korisnikid' => $korisnik->id, 'predstavaid' => $predstava->predstavaid, 'ocena' => $request->ocena]);
         if ($ocena->save()) {
@@ -254,9 +254,9 @@ class PredstaveController extends Controller
     public function dodajNaListuZelja(Request $request)
     {
         $predstava = Predstava::find($request->predstavaid);
-        $korisnik = $request->user();
+        $korisnik = auth('sanctum')->user();
         try {
-            if ($predstava->naListiOdgledanih()->exists()) {
+            if ($predstava->naListiOdgledanih()->where('korisnikid', $korisnik->id)->exists()) {
                 $predstava->naListiZelja()->updateExistingPivot($korisnik, ['statuszeljeid' => 1]);
             } else {
                 $predstava->naListiZelja()->attach($korisnik, ['statuszeljeid' => 1]);
@@ -272,13 +272,13 @@ class PredstaveController extends Controller
         $predstava = Predstava::find($request->predstavaid);
         $korisnik = auth('sanctum')->user();
         try {
-            if ($predstava->naListiZelja()->exists()) {
+            if ($predstava->naListiZelja()->where('korisnikid', $korisnik->id)->exists()) {
                 $predstava->naListiZelja()->updateExistingPivot($korisnik, ['statuszeljeid' => 2]);
             } else {
                 $predstava->naListiZelja()->attach($korisnik, ['statuszeljeid' => 2]);
             }
 
-            return response()->json();
+            return response()->json($predstava);
         } catch (Exception $e) {
             return response()->json($e->getMessage(), 500);
         }

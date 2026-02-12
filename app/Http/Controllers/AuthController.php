@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Korisnik;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -89,22 +90,21 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $userId = $request->id;
-        $user = Korisnik::find($userId);
 
-        // $request->user()->currentAccessToken()->delete();
+        try {
+            Auth::guard('web')->logout();
 
-        $tokenId = $user->tokens()->where('tokenable_id', $user->id)->value('id');
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
 
-        if ($user->tokens()->where('id', $tokenId)->delete()) {
-            $response = [
-                'message' => 'logged out'
-            ];
+            return response()->json([
+                'message' => 'Logged out successfully'
+            ], 200);
+        } catch (\Exception $e) {
 
-            return response($response, 201);
+            return response()->json([
+                'message' => 'Logout failed'
+            ], 500);
         }
-        //Auth::user()->currentAccessToken()->delete();
-        //$user->tokens()->where('id', $tokenId)->delete();
-        return response('Error', 500);
     }
 }

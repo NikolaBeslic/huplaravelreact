@@ -20,6 +20,7 @@ use App\Http\Controllers\ZanroviController;
 use App\Http\Controllers\GoogleAnalyticsController;
 use App\Http\Controllers\KomentariController;
 use App\Http\Controllers\ScraperController;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -70,9 +71,10 @@ Route::get('/get-texts-by-tag/{tag_slug}', [TagoviController::class, 'getTekstsB
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/logout', [AuthController::class, 'logout']);
+Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 
 Route::middleware('auth:sanctum')->get('/get-korisnicki-profil', [KorisniciController::class, 'getKorisnickiProfil']);
+Route::middleware('auth:sanctum')->delete('/obrisi-sa-liste-zelja/{predstavaid}', [KorisniciController::class, 'obrisiSaListeZelja']);
 
 Route::post('/adminlogin', [AdminAuthController::class, 'login']);
 /* Admin naslovna */
@@ -155,8 +157,7 @@ Route::delete('/admin/komentar-delete/{komentarid}', [KomentariController::class
 Route::get('/admin/unapproved-comments-count', [KomentariController::class, 'getUnapprovedCommentsCount']);
 
 /* Google Analytics */
-Route::get('/auth/google/redirect', [GoogleController::class, 'redirect']);
-Route::get('/auth/google/callback', [GoogleController::class, 'callback']);
+
 Route::get('/admin/get-fetches', [GoogleAnalyticsController::class, 'getFetches']);
 Route::get('/admin/get-ga-monthly-data', [GoogleAnalyticsController::class, 'getMonthlyData']);
 Route::get('/admin/get-fetch-details/{fetchId}', [GoogleAnalyticsController::class, 'getFetchDetails']);
@@ -176,6 +177,10 @@ Route::middleware('auth:sanctum')->post('/pozorista/dodajUOmiljena', [PozoristaC
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();    
+// });
 
 Route::post('/admin/uploadImage', [ImageUploadController::class, 'uploadImage']);
 
