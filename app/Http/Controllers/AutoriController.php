@@ -14,7 +14,7 @@ class AutoriController extends Controller
     //
     public function getAutori()
     {
-        $autori = Autor::select('autorid', 'ime_autora')->where('status_autora', 1)->orderBy('ime_autora')->get();
+        $autori = Autor::select('autorid', 'ime_autora', 'autor_slug', 'url_slike')->where('status_autora', 1)->orderBy('ime_autora')->get();
 
         return json_encode($autori);
     }
