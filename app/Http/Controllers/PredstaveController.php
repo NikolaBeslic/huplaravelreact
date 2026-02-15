@@ -40,12 +40,15 @@ class PredstaveController extends Controller
     public function getSinglePredstava($predstava_slug)
     {
         $predstava = Predstava::where('predstava_slug', $predstava_slug)
-            ->with('pozorista')
-            ->with('tekstovi')
+            ->with('pozorista:pozoristeid,naziv_pozorista,pozoriste_slug')
+            ->with('tekstovi:tekstid,naslov,slug,tekst_photo,published_at,created_at,sadrzaj,opis')
+            ->with('tekstovi.autori')
+            ->with('tekstovi.kategorija')
             ->with('zanrovi')
             ->with('ocena')
             ->with('igranja')
-            ->with('komentari')
+            ->with('igranja.pozoriste:pozoristeid,naziv_pozorista,pozoriste_slug')
+            ->with('komentari.korisnik')
             ->firstOrFail();
         $predstava->prosecnaOcena = round($predstava->ocena()->avg('ocena'), 1);
         $predstava->brojOcena = $predstava->ocena()->count();
@@ -55,7 +58,8 @@ class PredstaveController extends Controller
             $predstava->naListiOdgledanihKorisnika = $this->getNaListiOdgledanih($predstava);
         }
 
-        return PredstavaResource::make($predstava);
+        return response()->json($predstava);
+        //return PredstavaResource::make($predstava);
     }
     public function getOcenaKorisnika($predstava)
     {
