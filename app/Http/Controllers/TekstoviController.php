@@ -137,7 +137,8 @@ class TekstoviController extends Controller
     {
 
         $najnoviji = Tekst::where(['is_published' => 1, 'is_deleted' => 0])->with('kategorija')->orderBy('published_at', 'desc')->take(5)->get();
-        $najcitaniji = $this->getNajcitanijeTekstove();
+        //$najcitaniji = $this->getNajcitanijeTekstove();
+        $najcitaniji = $najnoviji;
         $result = $najcitaniji->union($najnoviji);
         return json_encode($result);
     }
