@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\Korisnik;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
@@ -32,8 +33,6 @@ class AuthController extends Controller
             ], 422);
         }
 
-
-
         if (Korisnik::create([
             'korisnicko_ime' => $request['korisnickoIme'],
             'email' => $request['email'],
@@ -42,43 +41,39 @@ class AuthController extends Controller
             return response()->json();
         }
         return response()->json("Nepoznata greska", 500);
-
-        // $token = $user->createToken('myapptoken')->plainTextToken;
-
-        // $response = [
-        //     'user' => $user,
-        //     'token' => $token,
-        // ];
-
-
     }
 
     public function login(Request $request)
     {
         $fields = $request->validate([
-            "email" => 'required|string',
+            "login_field" => 'required|string',
             "password" => 'required|string',
         ]);
 
-        // Check Email
-        $where = ["email" => $fields['email']];
-        $user = Korisnik::where($where)->first();
 
-        // Check Password
-        if (!$user || !Hash::check($fields['password'], $user->password)) {
-            return response([
-                'message' => "Bad credentials"
-            ], 401);
+        $login_field = $request->input('login_field');
+        $password = $request->input('password');
+        $user = Korisnik::where('korisnicko_ime', $login_field)->orWhere('email', $login_field)->first();
+
+        // Avoid leaking whether user exists
+        if (!$user) {
+            return response()->json("Pogrešni podaci za logovanje.", 401);
         }
 
-        $token = $user->createToken('myapptoken')->plainTextToken;
+        if ((int)$user->statuskorisnikaid !== 1) {
+            return response()->json("Account is disabled. Contact support.", 401);
+        }
 
-        $response = [
-            'user' => $user,
-            'token' => $token
-        ];
+        $fieldName = filter_var($login_field, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
-        return response($response, 201);
+
+        if (!Auth::attempt([$fieldName => $login_field, 'password' => $password], true)) {
+            return response()->json("Pogrešni podaci za logovanje.", 401);
+        }
+
+        $request->session()->regenerate();
+
+        return response()->json($user, 201);
     }
 
     public function user()

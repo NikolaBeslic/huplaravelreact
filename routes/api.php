@@ -76,7 +76,7 @@ Route::get('get-all-tagovi', [TagoviController::class, 'getAllTagovi']);
 Route::get('/get-texts-by-tag/{tag_slug}', [TagoviController::class, 'getTekstsByTag']);
 
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:20,1');;
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 
 Route::middleware('auth:sanctum')->get('/get-korisnicki-profil', [KorisniciController::class, 'getKorisnickiProfil']);
