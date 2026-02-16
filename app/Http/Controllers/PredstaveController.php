@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\Predstava;
 use App\Models\Zanr;
 use App\Models\Ocena;
+use App\Models\Tekst;
 use Dotenv\Exception\ValidationException;
 use Exception;
 use stdClass;
@@ -76,10 +77,23 @@ class PredstaveController extends Controller
             ->with([
                 'pozorista:pozoristeid,naziv_pozorista,pozoriste_slug,gradid',
                 'zanrovi:zanrid,naziv_zanra,zanr_slug,zanr_boja',
-                'ocena:predstavaid,ocena'
+                'ocena:predstavaid,ocena',
+                'komentari:komentarid,predstavaid',
             ])
-            ->withAvg(['ocena as prosecna_ocena'], 'ocena')
-            ->withCount(['ocena as broj_ocena'], 'korisnikid');
+            //->withAvg(['ocena as prosecna_ocena'], 'ocena')
+            ->withAggregate(['ocena as prosecna_ocena'], 'ROUND(AVG(ocena), 1)')
+            ->withCount(['ocena as broj_ocena'], 'korisnikid')
+            ->withCount(['komentari as broj_komentara', 'komentari']);
+
+        $q->addSelect([
+            'review_slug' => Tekst::query()
+                ->select('slug')
+                ->join('tekst_predstava', 'tekst.tekstid', '=', 'tekst_predstava.tekstid')
+                ->whereColumn('tekst_predstava.predstavaid', 'predstava.predstavaid') // adjust table name
+                ->where('tekst.kategorijaid', 4)
+                ->orderBy('tekst.tekstid', 'desc') // pick newest review if multiple
+                ->limit(1)
+        ]);
 
         // Search (scoped to predstava name; optionally include theatre name too)
         if ($search !== '') {
@@ -115,8 +129,13 @@ class PredstaveController extends Controller
 
         // Only shows with reviews
         if ($hasReviews) {
-            $q->whereRelation('tekstovi', 'kategorijaid', 4);
+
+            $q->whereHas('tekstovi', function ($t) {
+                $t->where('tekst.kategorijaid', 4);
+            });
         }
+
+
 
         // First show date (if you have igranja table with datum)
         // This adds a subselect column `first_show_date` you can sort by.
