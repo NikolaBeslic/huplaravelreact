@@ -61,6 +61,101 @@ class PredstaveController extends Controller
         return response()->json($predstava);
         //return PredstavaResource::make($predstava);
     }
+
+    public function getPredstaveFromFilter(Request $request)
+    {
+        $search = trim((string) $request->query('search', ''));
+        $zanrovi = $this->csvOrArrayToInts($request->query('zanrovi', []));
+        $gradovi = $this->csvOrArrayToInts($request->query('gradovi', []));
+        $pozorista = $this->csvOrArrayToInts($request->query('pozorista', []));
+        $hasReviews = filter_var($request->query('hasReviews', false), FILTER_VALIDATE_BOOLEAN);
+        $sort = (string) $request->query('sort', 'name_asc');
+
+        $q = Predstava::query()
+            ->select('predstavaid', 'naziv_predstave', 'predstava_slug', 'plakat', 'premijera')
+            ->with([
+                'pozorista:pozoristeid,naziv_pozorista,pozoriste_slug,gradid',
+                'zanrovi:zanrid,naziv_zanra,zanr_slug,zanr_boja',
+                'ocena:predstavaid,ocena'
+            ])
+            ->withAvg(['ocena as prosecna_ocena'], 'ocena')
+            ->withCount(['ocena as broj_ocena'], 'korisnikid');
+
+        // Search (scoped to predstava name; optionally include theatre name too)
+        if ($search !== '') {
+            $q->where(function ($qq) use ($search) {
+                $qq->where('naziv_predstave', 'like', "%{$search}%")
+                    // Optional: also allow searching by theatre name while still “predstave page”
+                    ->orWhereHas('pozorista', function ($p) use ($search) {
+                        $p->where('naziv_pozorista', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        // Genres (many-to-many)
+        if (!empty($zanrovi)) {
+            $q->whereHas('zanrovi', function ($z) use ($zanrovi) {
+                $z->whereIn('pripadazanru.zanrid', $zanrovi);
+            });
+        }
+
+        // Cities (via theatre)
+        if (!empty($gradovi)) {
+            $q->whereHas('pozorista', function ($p) use ($gradovi) {
+                $p->whereIn('gradid', $gradovi);
+            });
+        }
+
+        // Theatres
+        if (!empty($pozorista)) {
+            $q->whereHas('pozorista', function ($p) use ($pozorista) {
+                $p->whereIn('pozoristeid', $pozorista);
+            });
+        }
+
+        // Only shows with reviews
+        if ($hasReviews) {
+            $q->whereRelation('tekstovi', 'kategorijaid', 4);
+        }
+
+        // First show date (if you have igranja table with datum)
+        // This adds a subselect column `first_show_date` you can sort by.
+        // If you don’t have this table, remove this whole block + sorting cases that use it.
+        /*  $q->addSelect([
+            'first_show_date' => function ($sub) {
+                $sub->from('igranja')
+                    ->selectRaw('MIN(datum)')
+                    ->whereColumn('igranja.predstavaid', 'predstave.predstavaid');
+            }
+        ]); */
+
+        // ---- Sorting ----
+        switch ($sort) {
+
+            case 'rating_desc':
+                // avg_rating is NULL if no reviews; push NULLs last:
+                $q->orderByRaw('prosecna_ocena IS NULL asc')
+                    ->orderBy('prosecna_ocena', 'desc')
+                    ->orderBy('broj_ocena', 'desc')
+                    ->orderBy('naziv_predstave', 'asc');
+                break;
+
+            case 'premijera':
+                $q->orderBy('premijera', 'desc')->orderBy('naziv_predstave', 'asc');
+                break;
+
+            case 'name_asc':
+            default:
+                $q->orderBy('naziv_predstave', 'asc');
+                break;
+        }
+
+        // ---- Pagination ----
+        $result = $q->paginate(30)->appends($request->query());
+
+        return response()->json($result);
+    }
+
     public function getOcenaKorisnika($predstava)
     {
         $korisnikid = auth('sanctum')->user()->id;
@@ -306,5 +401,20 @@ class PredstaveController extends Controller
         } catch (Exception $e) {
             return response()->json($e->getMessage(), 500);
         }
+    }
+
+    private function csvOrArrayToInts($value): array
+    {
+        if (is_string($value)) {
+            $value = $value === '' ? [] : explode(',', $value);
+        }
+        if (!is_array($value)) return [];
+
+        return array_values(
+            array_filter(
+                array_map(fn($v) => (int) $v, $value),
+                fn($v) => $v > 0
+            )
+        );
     }
 }

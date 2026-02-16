@@ -50,19 +50,25 @@ Route::get('/get-najnovije-predstave', [PredstaveController::class, 'getNajpopul
 Route::get('/get-predstave-naslovna', [PredstaveController::class, 'getPredstaveZaNaslovnu']);
 Route::get('/get-all-predstave', [PredstaveController::class, 'getAllPredstave']);
 Route::get('/predstava-single/{predstava_slug}', [PredstaveController::class, 'getSinglePredstava']);
+Route::get('/get-predstave-filtered', [PredstaveController::class, 'getPredstaveFromFilter']);
+// Pozorista
 Route::get('/get-predstave-with-texts', [PredstaveController::class, 'getPredstaveWithTekst']);
 Route::get('/get-pozorista', [PozoristaController::class, 'getPozorista']);
 Route::get('/get-all-pozorista', [PozoristaController::class, 'getAllPozorista']);
 Route::get('/pozoriste-single/{pozoriste_slug}', [PozoristaController::class, 'getSinglePozoriste']);
+
 Route::get('/get-autori', [AutoriController::class, 'getAutori']);
 Route::get('/get-single-autor/{autor_slug}', [AutoriController::class, 'getSingleAutor']);
+
 Route::get('/get-repertoari', [RepertoariController::class, 'getJsonRepertoari']);
 Route::get('/get-zanrovi', [PredstaveController::class, 'getZanrovi']);
 Route::get('/get-gradovi', [PredstaveController::class, 'getGradovi']);
 Route::get('/get-some-posts', [TekstoviController::class, 'getSomePosts']);
+
 Route::get('/get-festivali', [FestivaliController::class, 'getFestivali']);
 Route::get('/festival-single/{festival_slug}', [FestivaliController::class, 'getSingleFestival']);
 Route::get('/get-all-festivali', [FestivaliController::class, 'getAllFestivali']);
+
 Route::get('/get-hupkast', [TekstoviController::class, 'getAllHuPkast']);
 Route::get('/hupkast-single/{hupkast_slug}', [TekstoviController::class, 'getSingleHuPkast']);
 Route::get('/get-hupikon', [TekstoviController::class, 'getAllHupikon']);
