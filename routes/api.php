@@ -78,117 +78,120 @@ Route::get('/get-texts-by-tag/{tag_slug}', [TagoviController::class, 'getTekstsB
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:20,1');;
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
-
 Route::middleware('auth:sanctum')->get('/get-korisnicki-profil', [KorisniciController::class, 'getKorisnickiProfil']);
 Route::middleware('auth:sanctum')->delete('/obrisi-sa-liste-zelja/{predstavaid}', [KorisniciController::class, 'obrisiSaListeZelja']);
-
-Route::post('/adminlogin', [AdminAuthController::class, 'login']);
-/* Admin naslovna */
-Route::get('/admin/tekstovi-za-naslovnu', [TekstoviController::class, 'adminGetTekstoviZaNaslovnu']);
-Route::get('/admin/predstave-za-naslovnu', [PredstaveController::class, 'adminGetPredstaveZaNaslovnu']);
-//Route::get('/admin/komentari-za-naslovnu', [KomentariController::class, 'getKomentariZaNaslovnu']);
-Route::get('/admin/festivali-za-naslovnu', [FestivaliController::class, 'adminGetFestivaliZaNaslovnu']);
-Route::get('/admin/igranja-za-naslovnu', [RepertoariController::class, 'getIgranjaZaNaslovnu']);
-
-Route::get('/admin/tekstovi', [TekstoviController::class, 'adminindex']);
-Route::get('/get-tekst/{tekstid}', [TekstoviController::class, 'getTekstById']);
-Route::put('/admin/tekstovi/istakni', [TekstoviController::class, 'istakniTekst']);
-Route::put('/admin/tekstovi/ukloni-sa-slajdera', [TekstoviController::class, 'ukloniSaSlajdera']);
-Route::get('/admin/get-all-combobox-data', [TekstoviController::class, 'getAllComboboxData']);
-Route::post('/admin/update-tekst', [TekstoviController::class, 'update2']);
-Route::post('/admin/create-tekst', [TekstoviController::class, 'store2']);
-/* Admin kategorije */
-Route::get('/admin/kategorije', [KategorijeController::class, 'adminindex']);
-Route::get('/admin/get-single-kategorija/{kategorijaid}', [KategorijeController::class, 'getSingleKategorija']);
-Route::post('/admin/create-kategorija', [KategorijeController::class, 'store']);
-Route::put('/admin/update-kategorija', [KategorijeController::class, 'update']);
-Route::get('/admin/get-sve-kategorije', [KategorijeController::class, 'getSveKategorije']);
-/* Admin zanrovi */
-Route::get('/admin/zanrovi', [ZanroviController::class, 'adminindex']);
-Route::get('/admin/get-single-zanr/{zanrid}', [ZanroviController::class, 'getSingleZanr']);
-Route::post('/admin/create-zanr', [ZanroviController::class, 'store']);
-Route::put('/admin/update-zanr', [ZanroviController::class, 'update']);
-/* Admin tagovi */
-Route::get('/admin/get-svi-tagovi', [TagoviController::class, 'getAllTagovi']);
-Route::post('/admin/tagovi/store', [TagoviController::class, 'storeTags']);
-/* Admin autori */
-Route::get('/admin/get-all-autori', [AutoriController::class, 'getAllAutori']);
-Route::get('/admin/get-single-autor/{autorid}', [AutoriController::class, 'getSingleAutorAdmin']);
-Route::get('/admin/get-gradovi', [PredstaveController::class, 'getGradovi']);
-Route::post('/admin/create-autor', [AutoriController::class, 'store']);
-Route::post('/admin/update-autor', [AutoriController::class, 'update']);
-/* Admin pozorista */
-Route::get('/admin/get-all-pozorista', [PozoristaController::class, 'getAllPozorista']);
-Route::get('/admin/get-single-pozoriste/{pozoristeid}', [PozoristaController::class, 'getSinglePozoristeAdmin']);
-Route::put('/admin/update-pozoriste', [PozoristaController::class, 'update']);
-Route::post('/admin/create-pozoriste', [PozoristaController::class, 'store']);
-/* Admin predstave */
-Route::get('/admin/get-all-predstave', [PredstaveController::class, 'getAllPredstaveAdmin']);
-Route::get('/admin/get-single-predstava/{predstavaid}', [PredstaveController::class, 'getSinglePredstavaById']);
-Route::post('/admin/create-predstava', [PredstaveController::class, 'store']);
-Route::post('/admin/update-predstava', [PredstaveController::class, 'update']);
-
-/* Admin HuPkast */
-Route::get('/admin/check-hupkast-rss', [HuPkastController::class, 'checkHuPkastRSS']);
-Route::get('/admin/hupkast/insert-new-episodes', [HuPkastController::class, 'insertHuPkastFromRss']);
-Route::get('/admin/get-all-hupkast', [HuPkastController::class, 'adminGetAllHupkast']);
-Route::post('/admin/hupkast-store', [TekstoviController::class, 'hupkastStore']);
-Route::get('/admin/get-hupkast-platforme', [HuPkastController::class, 'getHupkastPlatforme']);
-
-/* Admin HuPikon */
-Route::get('/admin/get-all-hupikon', [TekstoviController::class, 'adminGetAllHupikon']);
-Route::post('/admin/hupikon-store', [TekstoviController::class, 'hupikonStore']);
-
-/* Admin Reperotari */
-Route::get('/admin/pozoriste-with-predstave/{pozoriste_slug}', [PozoristaController::class, 'getPozoristeWithPredstave']);
-Route::get('/admin/get-igranja-pozorista/{pozoristeid}', [RepertoariController::class, 'getIgranjaPozorista']);
-Route::post('/admin/igranje-store', [RepertoariController::class, 'igranjeStore']);
-Route::put('/admin/igranje-update', [RepertoariController::class, 'igranjeUpdate']);
-Route::delete('/admin/igranje-delete/{id}', [RepertoariController::class, 'igranjeDelete']);
-Route::get('/admin/get-all-for-gostovanja', [RepertoariController::class, 'getAllForGostovanja']);
-Route::post('/admin/igranje-multi-store', [RepertoariController::class, 'igranjeMultiStore']);
-
-/* Admin Festivali */
-Route::get('/admin/get-all-festivali', [FestivaliController::class, 'adminGetAllFestivali']);
-Route::post('/admin/festival-store', [FestivaliController::class, 'store']);
-Route::post('/admin/festival-update', [FestivaliController::class, 'update']);
-Route::get('/admin/get-single-festival/{festivalid}', [FestivaliController::class, 'getSingleFestivalAdmin']);
-/* Admin Grad */
-Route::post("/admin/store-grad", [PozoristaController::class, 'gradStore']);
-
-/* Admin Komentari */
-Route::get("/admin/get-all-komentari", [KomentariController::class, 'getAllKomentari']);
-Route::put('/admin/odobri-komentar/{komentarid}', [KomentariController::class, 'odobriKomentar']);
-Route::delete('/admin/komentar-delete/{komentarid}', [KomentariController::class, 'deleteKomentar']);
-Route::get('/admin/unapproved-comments-count', [KomentariController::class, 'getUnapprovedCommentsCount']);
-
-/* Google Analytics */
-
-Route::get('/admin/get-fetches', [GoogleAnalyticsController::class, 'getFetches']);
-Route::get('/admin/get-ga-monthly-data', [GoogleAnalyticsController::class, 'getMonthlyData']);
-Route::get('/admin/get-fetch-details/{fetchId}', [GoogleAnalyticsController::class, 'getFetchDetails']);
-Route::get('/admin/get-total-visits-period', [GoogleAnalyticsController::class, 'getTotalVisitsForPeriod']);
-
-/* Scraping */
-Route::get('/admin/getAtelje212', [ScraperController::class, 'getAtelje212']);
-Route::get('/admin/getNarodnoBeograd', [ScraperController::class, 'getNarodnoBeograd']);
-Route::get('/admin/repertoari/{pozoriste_slug}/scrape', [ScraperController::class, 'scrapeRepertoarPozorista']);
-
 Route::middleware('auth:sanctum')->post('/predstava/oceni', [PredstaveController::class, 'oceni']);
 Route::middleware('auth:sanctum')->post('/predstava/dodajNaListuZelja', [PredstaveController::class, 'dodajNaListuZelja']);
 Route::middleware('auth:sanctum')->post('/predstava/dodajUOdgledane', [PredstaveController::class, 'dodajUOdgledane']);
 Route::middleware('auth:sanctum')->post('/predstava/dodaj-komentar', [PredstaveController::class, 'dodajKomentar']);
 Route::middleware('auth:sanctum')->post('/pozorista/dodajUOmiljena', [PozoristaController::class, 'dodajUOmiljena']);
-
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+Route::get('/admin/unapproved-comments-count', [KomentariController::class, 'getUnapprovedCommentsCount']);
+Route::post('/adminlogin', [AdminAuthController::class, 'login']);
+Route::middleware('auth:admin')
+    ->group(
+        function () {
+            Route::get('/admin/user', [AdminAuthController::class, 'user']);
+            /* Admin naslovna */
+            Route::get('/admin/tekstovi-za-naslovnu', [TekstoviController::class, 'adminGetTekstoviZaNaslovnu']);
+            Route::get('/admin/predstave-za-naslovnu', [PredstaveController::class, 'adminGetPredstaveZaNaslovnu']);
+            //Route::get('/admin/komentari-za-naslovnu', [KomentariController::class, 'getKomentariZaNaslovnu']);
+            Route::get('/admin/festivali-za-naslovnu', [FestivaliController::class, 'adminGetFestivaliZaNaslovnu']);
+            Route::get('/admin/igranja-za-naslovnu', [RepertoariController::class, 'getIgranjaZaNaslovnu']);
+
+            Route::get('/admin/tekstovi', [TekstoviController::class, 'adminindex']);
+            Route::get('/get-tekst/{tekstid}', [TekstoviController::class, 'getTekstById']);
+            Route::put('/admin/tekstovi/istakni', [TekstoviController::class, 'istakniTekst']);
+            Route::put('/admin/tekstovi/ukloni-sa-slajdera', [TekstoviController::class, 'ukloniSaSlajdera']);
+            Route::get('/admin/get-all-combobox-data', [TekstoviController::class, 'getAllComboboxData']);
+            Route::post('/admin/update-tekst', [TekstoviController::class, 'update2']);
+            Route::post('/admin/create-tekst', [TekstoviController::class, 'store2']);
+            /* Admin kategorije */
+            Route::get('/admin/kategorije', [KategorijeController::class, 'adminindex']);
+            Route::get('/admin/get-single-kategorija/{kategorijaid}', [KategorijeController::class, 'getSingleKategorija']);
+            Route::post('/admin/create-kategorija', [KategorijeController::class, 'store']);
+            Route::put('/admin/update-kategorija', [KategorijeController::class, 'update']);
+            Route::get('/admin/get-sve-kategorije', [KategorijeController::class, 'getSveKategorije']);
+            /* Admin zanrovi */
+            Route::get('/admin/zanrovi', [ZanroviController::class, 'adminindex']);
+            Route::get('/admin/get-single-zanr/{zanrid}', [ZanroviController::class, 'getSingleZanr']);
+            Route::post('/admin/create-zanr', [ZanroviController::class, 'store']);
+            Route::put('/admin/update-zanr', [ZanroviController::class, 'update']);
+            /* Admin tagovi */
+            Route::get('/admin/get-svi-tagovi', [TagoviController::class, 'getAllTagovi']);
+            Route::post('/admin/tagovi/store', [TagoviController::class, 'storeTags']);
+            /* Admin autori */
+            Route::get('/admin/get-all-autori', [AutoriController::class, 'getAllAutori']);
+            Route::get('/admin/get-single-autor/{autorid}', [AutoriController::class, 'getSingleAutorAdmin']);
+            Route::get('/admin/get-gradovi', [PredstaveController::class, 'getGradovi']);
+            Route::post('/admin/create-autor', [AutoriController::class, 'store']);
+            Route::post('/admin/update-autor', [AutoriController::class, 'update']);
+            /* Admin pozorista */
+            Route::get('/admin/get-all-pozorista', [PozoristaController::class, 'getAllPozorista']);
+            Route::get('/admin/get-single-pozoriste/{pozoristeid}', [PozoristaController::class, 'getSinglePozoristeAdmin']);
+            Route::put('/admin/update-pozoriste', [PozoristaController::class, 'update']);
+            Route::post('/admin/create-pozoriste', [PozoristaController::class, 'store']);
+            /* Admin predstave */
+            Route::get('/admin/get-all-predstave', [PredstaveController::class, 'getAllPredstaveAdmin']);
+            Route::get('/admin/get-single-predstava/{predstavaid}', [PredstaveController::class, 'getSinglePredstavaById']);
+            Route::post('/admin/create-predstava', [PredstaveController::class, 'store']);
+            Route::post('/admin/update-predstava', [PredstaveController::class, 'update']);
+
+            /* Admin HuPkast */
+            Route::get('/admin/check-hupkast-rss', [HuPkastController::class, 'checkHuPkastRSS']);
+            Route::get('/admin/hupkast/insert-new-episodes', [HuPkastController::class, 'insertHuPkastFromRss']);
+            Route::get('/admin/get-all-hupkast', [HuPkastController::class, 'adminGetAllHupkast']);
+            Route::post('/admin/hupkast-store', [TekstoviController::class, 'hupkastStore']);
+            Route::get('/admin/get-hupkast-platforme', [HuPkastController::class, 'getHupkastPlatforme']);
+
+            /* Admin HuPikon */
+            Route::get('/admin/get-all-hupikon', [TekstoviController::class, 'adminGetAllHupikon']);
+            Route::post('/admin/hupikon-store', [TekstoviController::class, 'hupikonStore']);
+
+            /* Admin Reperotari */
+            Route::get('/admin/pozoriste-with-predstave/{pozoriste_slug}', [PozoristaController::class, 'getPozoristeWithPredstave']);
+            Route::get('/admin/get-igranja-pozorista/{pozoristeid}', [RepertoariController::class, 'getIgranjaPozorista']);
+            Route::post('/admin/igranje-store', [RepertoariController::class, 'igranjeStore']);
+            Route::put('/admin/igranje-update', [RepertoariController::class, 'igranjeUpdate']);
+            Route::delete('/admin/igranje-delete/{id}', [RepertoariController::class, 'igranjeDelete']);
+            Route::get('/admin/get-all-for-gostovanja', [RepertoariController::class, 'getAllForGostovanja']);
+            Route::post('/admin/igranje-multi-store', [RepertoariController::class, 'igranjeMultiStore']);
+
+            /* Admin Festivali */
+            Route::get('/admin/get-all-festivali', [FestivaliController::class, 'adminGetAllFestivali']);
+            Route::post('/admin/festival-store', [FestivaliController::class, 'store']);
+            Route::post('/admin/festival-update', [FestivaliController::class, 'update']);
+            Route::get('/admin/get-single-festival/{festivalid}', [FestivaliController::class, 'getSingleFestivalAdmin']);
+            /* Admin Grad */
+            Route::post("/admin/store-grad", [PozoristaController::class, 'gradStore']);
+
+            /* Admin Komentari */
+            Route::get("/admin/get-all-komentari", [KomentariController::class, 'getAllKomentari']);
+            Route::put('/admin/odobri-komentar/{komentarid}', [KomentariController::class, 'odobriKomentar']);
+            Route::delete('/admin/komentar-delete/{komentarid}', [KomentariController::class, 'deleteKomentar']);
+
+            /* Google Analytics */
+            Route::get('/admin/get-fetches', [GoogleAnalyticsController::class, 'getFetches']);
+            Route::get('/admin/get-ga-monthly-data', [GoogleAnalyticsController::class, 'getMonthlyData']);
+            Route::get('/admin/get-fetch-details/{fetchId}', [GoogleAnalyticsController::class, 'getFetchDetails']);
+            Route::get('/admin/get-total-visits-period', [GoogleAnalyticsController::class, 'getTotalVisitsForPeriod']);
+
+            /* Scraping */
+            Route::get('/admin/getAtelje212', [ScraperController::class, 'getAtelje212']);
+            Route::get('/admin/getNarodnoBeograd', [ScraperController::class, 'getNarodnoBeograd']);
+            Route::get('/admin/repertoari/{pozoriste_slug}/scrape', [ScraperController::class, 'scrapeRepertoarPozorista']);
+
+            Route::post('/admin/uploadImage', [ImageUploadController::class, 'uploadImage']);
+        }
+    );
+
 
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();    
 // });
 
-Route::post('/admin/uploadImage', [ImageUploadController::class, 'uploadImage']);
 
 Route::post('/flmngr', function () {
 

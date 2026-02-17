@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Admin;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 
@@ -14,34 +15,29 @@ class AdminAuthController extends Controller
     public function login(Request $request)
     {
         $fields = $request->validate([
-            "email" => 'required|string',
+            "login_field" => 'required|string',
             "password" => 'required|string',
         ]);
 
-        // Check Email
-        $where = ["email" => $fields['email']];
-        $user = Admin::where($where)->first();
+        $login_field = $request->input('login_field');
+        $password = $request->input('password');
 
-        // Check Password
-        if (!$user || !Hash::check($fields['password'], $user->password)) {
-            return response([
-                'message' => "Bad credentials"
-            ], 401);
+        $fieldName = filter_var($login_field, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        $admin = Admin::where('username', $login_field)->orWhere('email', $login_field)->first();
+
+
+        if (!Auth::guard('admin')->attempt([$fieldName => $login_field, 'password' => $password], true)) {
+            return response()->json(['message' => 'Invalid credentials'], 422);
         }
 
-        $token = $user->createToken('myapptoken', ['role:admin'])->plainTextToken;
+        $request->session()->regenerate();
 
-        $response = [
-            'user' => $user,
-            'token' => $token
-        ];
-
-        return response($response, 201);
+        return response()->json($admin, 201);
     }
 
     public function user()
     {
-        $user = auth()->user();
+        $user = Auth::guard('admin')->user();
         return response($user, 201);
     }
 }
