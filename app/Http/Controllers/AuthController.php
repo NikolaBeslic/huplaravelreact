@@ -64,7 +64,7 @@ class AuthController extends Controller
             return response()->json("Account is disabled. Contact support.", 401);
         }
 
-        $fieldName = filter_var($login_field, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        $fieldName = filter_var($login_field, FILTER_VALIDATE_EMAIL) ? 'email' : 'korisnicko_ime';
 
 
         if (!Auth::attempt([$fieldName => $login_field, 'password' => $password], true)) {
