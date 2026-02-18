@@ -306,22 +306,16 @@ class TekstoviController extends Controller
         $tekst = Tekst::where(['slug' => $tekst_slug, 'kategorijaid' => $kategorija->kategorijaid, 'is_published' => 1])
             ->with('kategorija')
             ->with([
-                'autori' => function ($query) {
-                    $query->select('ime_autora', 'autor_slug', 'biografija', 'url_slike');
-                }
+                'autori:ime_autora,autor_slug,biografija,url_slike',
+                'predstave:naziv_predstave,predstava_slug,plakat,predstavaid',
+                'predstave.pozorista:naziv_pozorista,pozoristeid',
+                'predstave.zanrovi:naziv_zanra,zanr_boja,zanrid',
+                'pozorista:naziv_pozorista,pozoriste_slug,url_logo',
+                'tagovi',
+                'festival',
+                'hupikon',
+                'hupkast.linkovi'
             ])
-            ->with([
-                'predstave' => function ($query) {
-                    $query->select('naziv_predstave', 'predstava_slug', 'plakat');
-                }
-            ])
-            ->with(['pozorista' => function ($query) {
-                $query->select('naziv_pozorista', 'pozoriste_slug', 'url_logo');
-            }])
-            ->with('tagovi')
-            ->with('festival')
-            ->with('hupikon')
-            ->with('hupkast.linkovi')
             ->firstOrFail();
         //return TekstResource::make($tekst);
         return json_encode($tekst);
