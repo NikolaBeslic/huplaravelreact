@@ -364,9 +364,13 @@ class PredstaveController extends Controller
         $predstava = Predstava::find($request->predstavaid);
         $ocena = new Ocena(['korisnikid' => $korisnik->id, 'predstavaid' => $predstava->predstavaid, 'ocena' => $request->ocena]);
         if ($ocena->save()) {
-            $predstava->prosecnaOcena = round($predstava->ocena()->avg('ocena'), 1);
-            return $this->getSinglePredstava($predstava->predstava_slug);
+            $result = new stdClass();
+            $result->prosecnaOcena = round($predstava->ocena()->avg('ocena'), 1);
+            $result->ocenaKorisnika = $this->getOcenaKorisnika($predstava);
+            $result->brojOcena = $predstava->ocena->count();
+            return response()->json($result);
         }
+        return response()->json("Greska prilikom ocenjivanja", 500);
     }
 
     public function dodajNaListuZelja(Request $request)
