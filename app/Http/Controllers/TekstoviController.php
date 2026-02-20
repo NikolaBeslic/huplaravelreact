@@ -293,7 +293,12 @@ class TekstoviController extends Controller
     {
         $kategorija = Kategorija::where('kategorija_slug', $kategorija_slug)->firstOrFail();
         $katIds = $this->getAllKategIds($kategorija);
-        $tekstovi = Tekst::whereIn('kategorijaid', $katIds)->where('is_published', 1)->with(['kategorija'])->orderBy('published_at', 'desc')->paginate(8);
+        $tekstovi = Tekst::select('naslov', 'slug', 'sadrzaj', 'tekst_photo', 'created_at', 'published_at', 'uvod', 'kategorijaid')
+            ->whereIn('kategorijaid', $katIds)
+            ->where('is_published', 1)
+            ->with('kategorija:kategorijaid,naziv_kategorije,kategorija_boja,kategorija_slug')
+            ->orderBy('published_at', 'desc')
+            ->paginate(12);
         $kategorija->setRelation('tekstovi', $tekstovi);
         return json_encode($kategorija);
         // $result = KategorijaResource::make($kategorija);

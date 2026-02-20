@@ -88,6 +88,8 @@ Route::middleware('auth:sanctum')->post('/pozorista/dodajUOmiljena', [PozoristaC
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+/***** ADMIN ROUTES *****/
 Route::get('/admin/unapproved-comments-count', [KomentariController::class, 'getUnapprovedCommentsCount']);
 Route::post('/adminlogin', [AdminAuthController::class, 'login']);
 Route::middleware('auth:admin')
