@@ -53,10 +53,13 @@ class PredstaveController extends Controller
             ->firstOrFail();
         $predstava->prosecnaOcena = round($predstava->ocena()->avg('ocena'), 1);
         $predstava->brojOcena = $predstava->ocena()->count();
-        if (auth('sanctum')->user()) {
+        if (auth('sanctum')->user() != null) {
             $predstava->ocenaKorisnika = $this->getOcenaKorisnika($predstava);
             $predstava->naListiZeljaKorisnika = $this->getNaListiZelja($predstava);
             $predstava->naListiOdgledanihKorisnika = $this->getNaListiOdgledanih($predstava);
+            if ($predstava->naListiOdgledanihKorisnika) {
+                $predstava->naListiZeljaKorisnika = true;
+            }
         }
 
         return response()->json($predstava);
@@ -400,7 +403,7 @@ class PredstaveController extends Controller
                 $predstava->naListiZelja()->attach($korisnik, ['statuszeljeid' => 2]);
             }
 
-            return response()->json($predstava);
+            return response()->json();
         } catch (Exception $e) {
             return response()->json($e->getMessage(), 500);
         }
