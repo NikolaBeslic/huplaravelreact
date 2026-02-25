@@ -551,7 +551,6 @@ class TekstoviController extends Controller
             $request->validate([
                 'naslov' => 'required',
                 'slug' => 'required',
-                'slika' => 'required',
                 'uvod' => 'required|max:280 ',
             ]);
         } catch (ValidationException $e) {
@@ -709,8 +708,24 @@ class TekstoviController extends Controller
     public function getSingleHuPkast($hupkast_slug)
     {
         $hupkast = Tekst::where('slug', $hupkast_slug)->where('is_published', 1)->with('hupkast.linkovi')->with('autori')->firstOrFail();
+        $hupkast->relatedHupkasts = $this->getRelatedHupkasts($hupkast->tekstid);
         return json_encode($hupkast);
     }
+
+    // TO DO get close episodes, next, prev
+    public function getRelatedHupkasts($tekstid)
+    {
+        $relatedHupkasts = Tekst::select('tekstid', 'naslov', 'slug', 'tekst_photo', 'published_at', 'kategorijaid')
+            ->where('tekstid', '<>', $tekstid)
+            ->where(['is_published' => 1, 'kategorijaid' => 11])
+            ->with('kategorija:kategorijaid,naziv_kategorije,kategorija_boja,kategorija_slug')
+            ->with('hupkast')
+            ->orderByDesc('published_at')
+            ->take(5)
+            ->get();
+        return $relatedHupkasts;
+    }
+
     /* Pagination added consider change method */
     public function getAllHupikon()
     {
