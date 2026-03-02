@@ -47,8 +47,14 @@ class PredstaveController extends Controller
             ->with('tekstovi.kategorija')
             ->with('zanrovi')
             ->with('ocena')
-            ->with('igranja')
-            ->with('igranja.pozoriste:pozoristeid,naziv_pozorista,pozoriste_slug')
+            ->with(['igranja' => function ($query) {
+                $query->whereDate('datum', '>=', today())
+                    ->orWhere(function ($q2) {
+                        $q2->whereDate('datum', today())
+                            ->where('vreme', '>=', now()->format('H:i:s'));
+                    })
+                    ->with('pozoriste:pozoristeid,naziv_pozorista,pozoriste_slug');
+            }])
             ->with('komentari.korisnik')
             ->firstOrFail();
         $predstava->prosecnaOcena = round($predstava->ocena()->avg('ocena'), 1);
