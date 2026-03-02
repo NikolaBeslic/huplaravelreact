@@ -92,10 +92,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 /***** ADMIN ROUTES *****/
 Route::get('/admin/unapproved-comments-count', [KomentariController::class, 'getUnapprovedCommentsCount']);
 Route::post('/adminlogin', [AdminAuthController::class, 'login']);
+
 Route::middleware('auth:admin')
     ->group(
         function () {
             Route::get('/admin/user', [AdminAuthController::class, 'user']);
+            Route::post('/adminlogout', [AdminAuthController::class, 'logout']);
             /* Admin naslovna */
             Route::get('/admin/tekstovi-za-naslovnu', [TekstoviController::class, 'adminGetTekstoviZaNaslovnu']);
             Route::get('/admin/predstave-za-naslovnu', [PredstaveController::class, 'adminGetPredstaveZaNaslovnu']);

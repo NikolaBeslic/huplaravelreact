@@ -6,7 +6,7 @@ use App\Models\Admin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-
+use Illuminate\Validation\ValidationException;
 
 class AdminAuthController extends Controller
 {
@@ -14,10 +14,15 @@ class AdminAuthController extends Controller
 
     public function login(Request $request)
     {
-        $fields = $request->validate([
-            "login_field" => 'required|string',
-            "password" => 'required|string',
-        ]);
+        try {
+            $request->validate([
+
+                "login_field" => 'required|string',
+                "password" => 'required|string',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json($e, 422);
+        }
 
         $login_field = $request->input('login_field');
         $password = $request->input('password');
@@ -27,7 +32,7 @@ class AdminAuthController extends Controller
 
 
         if (!Auth::guard('admin')->attempt([$fieldName => $login_field, 'password' => $password], true)) {
-            return response()->json(['message' => 'Invalid credentials'], 422);
+            return response()->json("Pogrešni podaci za logovanje.", 401);
         }
 
         $request->session()->regenerate();
@@ -39,5 +44,24 @@ class AdminAuthController extends Controller
     {
         $user = Auth::guard('admin')->user();
         return response($user, 201);
+    }
+
+    public function logout(Request $request)
+    {
+        try {
+            Auth::guard('admin')->logout();
+
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return response()->json([
+                'message' => 'Logged out successfully'
+            ], 200);
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'message' => 'Logout failed'
+            ], 500);
+        }
     }
 }
