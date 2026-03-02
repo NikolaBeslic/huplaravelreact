@@ -9,6 +9,7 @@ use App\Models\Scena;
 use Dotenv\Exception\ValidationException;
 use Illuminate\Http\Request;
 use stdClass;
+use Carbon\Carbon;
 
 class RepertoariController extends Controller
 {
@@ -32,7 +33,7 @@ class RepertoariController extends Controller
                     ->with(['zanrovi' => function ($query) {
                         $query->select('naziv_zanra', 'zanr_slug');
                     }]);
-            }])->with('scena')->orderBy('datum', 'asc')
+            }])->with('scena')->orderBy('datum', 'desc')
             ->take(100)->get();
         foreach ($igranja as $igr) {
             $igr->title = $igr->predstava->naziv_predstave;
@@ -55,7 +56,7 @@ class RepertoariController extends Controller
                 'predstavaid',
                 'scenaid',
             ])
-            ->whereDate('datum', '2019-09-20')
+            ->whereDate('datum', today())
             ->orderBy('datum')
             ->orderBy('vreme')
             ->limit(10)
