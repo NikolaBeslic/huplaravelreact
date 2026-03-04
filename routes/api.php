@@ -77,15 +77,15 @@ Route::get('/get-texts-by-tag/{tag_slug}', [TagoviController::class, 'getTekstsB
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:20,1');;
-Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
-Route::middleware('auth:sanctum')->get('/get-korisnicki-profil', [KorisniciController::class, 'getKorisnickiProfil']);
-Route::middleware('auth:sanctum')->delete('/obrisi-sa-liste-zelja/{predstavaid}', [KorisniciController::class, 'obrisiSaListeZelja']);
-Route::middleware('auth:sanctum')->post('/predstava/oceni', [PredstaveController::class, 'oceni']);
-Route::middleware('auth:sanctum')->post('/predstava/dodajNaListuZelja', [PredstaveController::class, 'dodajNaListuZelja']);
-Route::middleware('auth:sanctum')->post('/predstava/dodajUOdgledane', [PredstaveController::class, 'dodajUOdgledane']);
-Route::middleware('auth:sanctum')->post('/predstava/dodaj-komentar', [PredstaveController::class, 'dodajKomentar']);
-Route::middleware('auth:sanctum')->post('/pozorista/dodajUOmiljena', [PozoristaController::class, 'dodajUOmiljena']);
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+Route::middleware(['auth:sanctum', 'verified'])->post('/logout', [AuthController::class, 'logout']);
+Route::middleware(['auth:sanctum', 'verified'])->get('/get-korisnicki-profil', [KorisniciController::class, 'getKorisnickiProfil']);
+Route::middleware(['auth:sanctum', 'verified'])->delete('/obrisi-sa-liste-zelja/{predstavaid}', [KorisniciController::class, 'obrisiSaListeZelja']);
+Route::middleware(['auth:sanctum', 'verified'])->post('/predstava/oceni', [PredstaveController::class, 'oceni']);
+Route::middleware(['auth:sanctum', 'verified'])->post('/predstava/dodajNaListuZelja', [PredstaveController::class, 'dodajNaListuZelja']);
+Route::middleware(['auth:sanctum', 'verified'])->post('/predstava/dodajUOdgledane', [PredstaveController::class, 'dodajUOdgledane']);
+Route::middleware(['auth:sanctum', 'verified'])->post('/predstava/dodaj-komentar', [PredstaveController::class, 'dodajKomentar']);
+Route::middleware(['auth:sanctum', 'verified'])->post('/pozorista/dodajUOmiljena', [PozoristaController::class, 'dodajUOmiljena']);
+Route::middleware(['auth:sanctum', 'verified'])->get('/user', function (Request $request) {
     return $request->user();
 });
 
@@ -192,7 +192,7 @@ Route::middleware('auth:admin')
     );
 
 
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+// Route::middleware(['auth:sanctum', 'verified'])->get('/user', function (Request $request) {
 //     return $request->user();    
 // });
 

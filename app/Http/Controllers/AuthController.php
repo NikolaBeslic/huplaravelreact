@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Korisnik;
+use Exception;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -33,14 +34,17 @@ class AuthController extends Controller
             ], 422);
         }
 
-        if (Korisnik::create([
-            'korisnicko_ime' => $request['korisnickoIme'],
-            'email' => $request['email'],
-            'password' => bcrypt($request['password']),
-        ])) {
+        try {
+            $korisnik = Korisnik::create([
+                'korisnicko_ime' => $request['korisnickoIme'],
+                'email' => $request['email'],
+                'password' => bcrypt($request['password']),
+            ]);
+            $korisnik->sendEmailVerificationNotification();
             return response()->json();
+        } catch (\Exception $e) {
+            return response()->json($e->getMessage(), 500);
         }
-        return response()->json("Nepoznata greska", 500);
     }
 
     public function login(Request $request)

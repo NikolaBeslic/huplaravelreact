@@ -235,4 +235,6 @@ return [
 
     ],
 
+    'frontend_url' => env('FRONT_END_BASEURL', 'http://localhost:3000'),
+
 ];

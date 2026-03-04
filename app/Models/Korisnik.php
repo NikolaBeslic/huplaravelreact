@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Notifications\VerifyEmailCustom;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class Korisnik extends Authenticatable
+class Korisnik extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, Notifiable;
     //
@@ -69,5 +71,10 @@ class Korisnik extends Authenticatable
         return $this->hasMany(Komentar::class, 'korisnikid')
             ->select('komentarid', 'korisnikid', 'predstavaid', 'tekst_komentara', 'created_at')
             ->with(['predstava:predstavaid,naziv_predstave,predstava_slug']);
+    }
+
+    public function sendEmailVerificationNotification()
+    {
+        $this->notify(new VerifyEmailCustom);
     }
 }
