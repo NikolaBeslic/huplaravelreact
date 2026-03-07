@@ -59,6 +59,11 @@ class Korisnik extends Authenticatable implements MustVerifyEmail
             ]);
     }
 
+    public function ocena()
+    {
+        return $this->hasMany(Ocena::class, 'korisnikid');
+    }
+
     public function omiljenaPozorista()
     {
         return $this->belongsToMany(Pozoriste::class, 'omiljena_pozorista', 'korisnikid', 'pozoristeid')

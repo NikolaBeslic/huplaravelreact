@@ -16,6 +16,7 @@ class KorisniciController extends Controller
             ->with('listaOdgledanih')
             ->with('komentari')
             ->with('omiljenaPozorista')
+            ->withAggregate(['ocena as prosecna_ocena'], 'ROUND(AVG(ocena), 1)')
             ->firstOrFail();
         return json_encode($korisnik);
     }

@@ -388,7 +388,7 @@ class PredstaveController extends Controller
             } else {
                 $predstava->naListiZelja()->attach($korisnik, ['statuszeljeid' => 1]);
             }
-            return response()->json();
+            return response()->json($predstava);
         } catch (Exception $e) {
             return response()->json($e->getMessage(), 500);
         }
@@ -405,7 +405,7 @@ class PredstaveController extends Controller
                 $predstava->naListiZelja()->attach($korisnik, ['statuszeljeid' => 2]);
             }
 
-            return response()->json();
+            return response()->json($predstava);
         } catch (Exception $e) {
             return response()->json($e->getMessage(), 500);
         }
