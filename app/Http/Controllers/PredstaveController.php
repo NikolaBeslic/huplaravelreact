@@ -55,7 +55,9 @@ class PredstaveController extends Controller
                     })
                     ->with('pozoriste:pozoristeid,naziv_pozorista,pozoriste_slug');
             }])
-            ->with('komentari.korisnik')
+            ->with(['komentari' => function ($query) {
+                $query->where('statuskomentaraid', 2)->orderByDesc('created_at')->with('korisnik');
+            }])
             ->firstOrFail();
         $predstava->prosecnaOcena = round($predstava->ocena()->avg('ocena'), 1);
         $predstava->brojOcena = $predstava->ocena()->count();

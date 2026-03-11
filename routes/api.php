@@ -173,7 +173,7 @@ Route::middleware('auth:admin')
 
             /* Admin Komentari */
             Route::get("/admin/get-all-komentari", [KomentariController::class, 'getAllKomentari']);
-            Route::put('/admin/odobri-komentar/{komentarid}', [KomentariController::class, 'odobriKomentar']);
+            Route::post('/admin/odobri-komentar/', [KomentariController::class, 'odobriKomentar']);
             Route::delete('/admin/komentar-delete/{komentarid}', [KomentariController::class, 'deleteKomentar']);
 
             /* Google Analytics */

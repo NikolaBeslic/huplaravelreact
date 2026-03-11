@@ -15,9 +15,9 @@ class KomentariController extends Controller
         return response()->json($komentari);
     }
 
-    public function odobriKomentar($komentarid)
+    public function odobriKomentar(Request $request)
     {
-        $komentar = Komentar::with(['korisnik', 'predstava'])->find($komentarid);
+        $komentar = Komentar::with(['korisnik', 'predstava'])->find($request->komentarid);
         if (!$komentar) {
             return response()->json(['message' => 'Komentar nije pronađen'], 404);
         }
