@@ -54,9 +54,11 @@ class Korisnik extends Authenticatable implements MustVerifyEmail
             ->select('predstava.predstavaid', 'naziv_predstave', 'predstava_slug', 'plakat')
             ->wherePivot('statuszeljeid', 2)
             ->with('ocenaKorisnika')
+            ->with('komentarKorisnika')
             ->with([
                 'pozorista:pozoristeid,naziv_pozorista,pozoriste_slug'
-            ]);
+            ])
+            ->with('zanrovi');
     }
 
     public function ocena()

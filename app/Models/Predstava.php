@@ -64,8 +64,13 @@ class Predstava extends Model
         return $this->hasOne(Ocena::class, 'predstavaid')->where('korisnikid', Auth::id());
     }
 
+    public function komentarKorisnika()
+    {
+        return $this->hasOne(Komentar::class, 'predstavaid')->where('korisnikid', Auth::id());
+    }
+
     public function narednoIgranje()
     {
-        return $this->hasOne(Igranje::class, 'predstavaid');
+        return $this->hasOne(Igranje::class, 'predstavaid')->whereDate('datum', '>=', now());
     }
 }
