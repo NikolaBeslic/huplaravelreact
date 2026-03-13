@@ -317,7 +317,7 @@ class TekstoviController extends Controller
                 'predstave.zanrovi:naziv_zanra,zanr_boja,zanrid',
                 'pozorista:naziv_pozorista,pozoriste_slug,url_logo',
                 'tagovi',
-                'festival',
+                'festival.grad',
                 'hupikon',
                 'hupkast.linkovi'
             ])
