@@ -64,8 +64,8 @@ class AuthController extends Controller
             return response()->json("Pogrešni podaci za logovanje.", 401);
         }
 
-        if ((int)$user->statuskorisnikaid !== 1) {
-            return response()->json("Account is disabled. Contact support.", 401);
+        if ((int)$user->statuskorisnikaid !== 1 || $user->email_verified_at == null) {
+            return response()->json("Vaš nalog nije aktivan. Proverite vaš email za aktivacioni link ili kontaktirajte našu podršku", 401);
         }
 
         $fieldName = filter_var($login_field, FILTER_VALIDATE_EMAIL) ? 'email' : 'korisnicko_ime';
