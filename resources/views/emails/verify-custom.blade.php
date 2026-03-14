@@ -57,7 +57,7 @@
                             </table>
 
                             <p style="margin:20px;font-size:13px;line-height:1.6;color:#6b7280;">
-                                Ako dugme ne radi, kopirajte ovaj link u browser:
+                                Ako klik dugme ne radi, kopirajte ovaj link u browser:
                             </p>
                             <p
                                 style="margin:8px 0 0;font-size:12px;line-height:1.6;color:#6b7280;word-break:break-all;">

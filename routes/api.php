@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\PredstaveController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -76,7 +77,9 @@ Route::get('get-all-tagovi', [TagoviController::class, 'getAllTagovi']);
 Route::get('/get-texts-by-tag/{tag_slug}', [TagoviController::class, 'getTekstsByTag']);
 
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:20,1');;
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:20,1');
+Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLink']);
+Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword']);
 Route::middleware(['auth:sanctum', 'verified'])->post('/logout', [AuthController::class, 'logout']);
 Route::middleware(['auth:sanctum', 'verified'])->get('/get-korisnicki-profil', [KorisniciController::class, 'getKorisnickiProfil']);
 Route::middleware(['auth:sanctum', 'verified'])->delete('/obrisi-sa-liste-zelja/{predstavaid}', [KorisniciController::class, 'obrisiSaListeZelja']);
