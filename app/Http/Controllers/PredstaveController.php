@@ -10,6 +10,7 @@ use App\Models\Predstava;
 use App\Models\Zanr;
 use App\Models\Ocena;
 use App\Models\Tekst;
+use Carbon\Carbon;
 use Dotenv\Exception\ValidationException;
 use Exception;
 use stdClass;
@@ -268,6 +269,7 @@ class PredstaveController extends Controller
     {
         $premijere = Predstava::select('predstavaid', 'naziv_predstave', 'predstava_slug', 'premijera', 'plakat')
             ->with('pozorista:pozoristeid,pozoriste_slug,naziv_pozorista')
+            ->whereDate('premijera', '>=', Carbon::today()->toDateString())
             ->orderBy('premijera', 'desc')
             ->take(5)
             ->get();
