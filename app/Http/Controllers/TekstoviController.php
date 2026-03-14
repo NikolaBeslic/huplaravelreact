@@ -574,6 +574,7 @@ class TekstoviController extends Controller
             $tekst->predstave()->sync($request->predstave);
             $tekst->tagovi()->sync($request->tagovi);
             $tekst->pozorista()->sync($request->pozorista);
+            $tekst->autori()->sync($request->autori);
 
             if ($tekst->kategorijaid == 11) {
                 $hupkast = Hupkast::with('linkovi')->where('tekstid', $tekst->tekstid)->firstOrFail();
@@ -678,6 +679,7 @@ class TekstoviController extends Controller
             $tekst->predstave()->sync($request->predstave);
             $tekst->tagovi()->sync($request->tagovi);
             $tekst->pozorista()->sync($request->pozorista);
+            $tekst->autori()->sync($request->autori);
 
             return response()->json([], 200);
         } else {
