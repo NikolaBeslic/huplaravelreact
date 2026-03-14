@@ -39,7 +39,7 @@ class Korisnik extends Authenticatable implements MustVerifyEmail
             ->select('predstava.predstavaid', 'naziv_predstave', 'predstava_slug', 'plakat')
             ->wherePivot('statuszeljeid', 1)
             ->with([
-                'pozorista:pozoristeid,naziv_pozorista',
+                'pozorista:pozoristeid,naziv_pozorista,skraceni_naziv',
                 'narednoIgranje'
             ]);
     }
