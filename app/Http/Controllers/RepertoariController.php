@@ -23,7 +23,7 @@ class RepertoariController extends Controller
     public function getJsonRepertoari()
     {
         $igranja = Igranje::with(['pozoriste' => function ($query) {
-            $query->select('naziv_pozorista', 'pozoriste_slug', 'pozoristeid', 'gradid')
+            $query->select('naziv_pozorista', 'pozoriste_slug', 'pozoristeid', 'skraceni_naziv', 'gradid')
                 ->with(['grad' => function ($query) {
                     $query->select('naziv_grada', 'gradid');
                 }]);
@@ -61,7 +61,7 @@ class RepertoariController extends Controller
             ->orderBy('vreme')
             ->limit(10)
             ->with([
-                'pozoriste:pozoristeid,naziv_pozorista,pozoriste_slug,gradid',
+                'pozoriste:pozoristeid,naziv_pozorista,pozoriste_slug,skraceni_naziv,gradid',
                 'scena:scenaid,naziv_scene',
                 'predstava:predstavaid,naziv_predstave,predstava_slug,plakat',
                 'predstava.zanrovi:zanrid,naziv_zanra,zanr_slug',
