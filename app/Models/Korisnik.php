@@ -41,7 +41,8 @@ class Korisnik extends Authenticatable implements MustVerifyEmail
             ->with([
                 'pozorista:pozoristeid,naziv_pozorista,skraceni_naziv',
                 'narednoIgranje'
-            ]);
+            ])
+            ->with('zanrovi');
     }
 
     public function listaOdgledanih()

@@ -87,7 +87,7 @@ class PredstaveController extends Controller
         $q = Predstava::query()
             ->select('predstavaid', 'naziv_predstave', 'predstava_slug', 'plakat', 'premijera')
             ->with([
-                'pozorista:pozoristeid,naziv_pozorista,pozoriste_slug,gradid',
+                'pozorista:pozoristeid,naziv_pozorista,pozoriste_slug,skraceni_naziv,gradid',
                 'zanrovi:zanrid,naziv_zanra,zanr_slug,zanr_boja',
                 'ocena:predstavaid,ocena',
                 'komentari:komentarid,predstavaid',
