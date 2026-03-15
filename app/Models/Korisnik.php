@@ -57,7 +57,7 @@ class Korisnik extends Authenticatable implements MustVerifyEmail
             ->with('ocenaKorisnika')
             ->with('komentarKorisnika')
             ->with([
-                'pozorista:pozoristeid,naziv_pozorista,pozoriste_slug'
+                'pozorista:pozoristeid,naziv_pozorista,pozoriste_slug,skraceni_naziv'
             ])
             ->with('zanrovi');
     }
