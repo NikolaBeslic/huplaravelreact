@@ -62,6 +62,7 @@ Route::get('/get-autori', [AutoriController::class, 'getAutori']);
 Route::get('/get-single-autor/{autor_slug}', [AutoriController::class, 'getSingleAutor']);
 
 Route::get('/get-repertoari', [RepertoariController::class, 'getJsonRepertoari']);
+Route::get('/get-repertoari-filtered', [RepertoariController::class, 'getRepertoariFromFilter']);
 Route::get('/get-zanrovi', [PredstaveController::class, 'getZanrovi']);
 Route::get('/get-gradovi', [PredstaveController::class, 'getGradovi']);
 Route::get('/get-some-posts', [TekstoviController::class, 'getSomePosts']);

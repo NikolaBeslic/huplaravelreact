@@ -44,6 +44,45 @@ class RepertoariController extends Controller
         return json_encode($igranja);
     }
 
+    public function getRepertoariFromFilter(Request $request)
+    {
+        $zanrovi = $this->csvOrArrayToInts($request->query('zanrovi', []));
+        $gradovi = $this->csvOrArrayToInts($request->query('gradovi', []));
+        $datumi = $request->query('datumi');
+        $q = Igranje::query()
+            ->select('seigraid', 'datum', 'vreme', 'predstavaid', 'pozoristeid', 'scenaid')
+            ->with([
+                'pozoriste:pozoristeid,naziv_pozorista,pozoriste_slug,skraceni_naziv,gradid',
+                'predstava:predstavaid,naziv_predstave,predstava_slug,plakat',
+                'predstava.zanrovi:zanrid,naziv_zanra,zanr_slug,zanr_boja',
+            ]);
+
+        // Genres (many-to-many)
+        if (!empty($zanrovi)) {
+            $q->whereHas('predstava.zanrovi', function ($z) use ($zanrovi) {
+                $z->whereIn('pripadazanru.zanrid', $zanrovi);
+            });
+        }
+
+        // Cities (via theatre)
+        if (!empty($gradovi)) {
+            $q->whereHas('pozoriste', function ($p) use ($gradovi) {
+                $p->whereIn('gradid', $gradovi);
+            });
+        }
+
+        if (!empty($datumi) && count($datumi) == 2) {
+            $q->where('datum', '>=', $datumi[0])->where('datum', '<=', $datumi[1]);
+        }
+
+        // ---- Pagination ----
+        $result = $q->orderBy('datum')
+            ->orderBy('vreme')
+            ->paginate(30)->appends($request->query());
+
+        return response()->json($result);
+    }
+
 
     public function getDanasNaRepertoaru()
     {
@@ -296,5 +335,20 @@ class RepertoariController extends Controller
     {
         $test = Igranje::where('predstavaid', $igranje->predstavaid)->where('datum', '=', $igranje->datum)->where('vreme', '=', $igranje->vreme)->exists();
         return !$test;
+    }
+
+    private function csvOrArrayToInts($value): array
+    {
+        if (is_string($value)) {
+            $value = $value === '' ? [] : explode(',', $value);
+        }
+        if (!is_array($value)) return [];
+
+        return array_values(
+            array_filter(
+                array_map(fn($v) => (int) $v, $value),
+                fn($v) => $v > 0
+            )
+        );
     }
 }
