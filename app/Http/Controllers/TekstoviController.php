@@ -797,7 +797,7 @@ class TekstoviController extends Controller
         $pozorista = Pozoriste::select('pozoristeid', 'naziv_pozorista')->orderBy('naziv_pozorista')->get();
         $autori = Autor::select('autorid', 'ime_autora')->where('status_autora', 1)->orderBy('ime_autora')->get();
         $festivali = Festival::select('festivalid', 'naziv_festivala')->orderBy('datumod', 'desc')->get();
-        $predstave = Predstava::select('predstavaid', 'naziv_predstave')->orderBy('naziv_predstave')->get();
+        $predstave = $this->vratiPredstaveZaDropdown2();
         $tagovi = Tag::select('tagid', 'tag_naziv')->orderBy('tag_naziv')->get();
 
         $result = new stdClass();
@@ -808,5 +808,21 @@ class TekstoviController extends Controller
         $result->tagovi = $tagovi;
 
         return json_encode($result);
+    }
+
+    public  function vratiPredstaveZaDropdown2()
+    {
+        $predstave = Predstava::select('predstavaid', 'naziv_predstave')->with(['pozorista' => function ($query) {
+            $query->select('naziv_pozorista', 'pozoriste.pozoristeid');
+        }])->orderBy('naziv_predstave', 'asc')->get();
+
+        $predstaveCounts = $predstave->groupBy('naziv_predstave')->map->count();
+
+        foreach ($predstave as $pred) {
+            if ($predstaveCounts[$pred->naziv_predstave] > 1) {
+                $pred->naziv_predstave = $pred->naziv_predstave . ' - ' . $pred->pozorista->pluck('naziv_pozorista')->implode(', ');
+            }
+        }
+        return $predstave;
     }
 }
