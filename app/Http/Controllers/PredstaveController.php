@@ -326,6 +326,7 @@ class PredstaveController extends Controller
 
         if ($predstava->save()) {
             $predstava->pozorista()->attach($request->pozorista);
+            $predstava->zanrovi()->attach($request->zanrovi);
             return response()->json([], 200);
         }
     }
@@ -354,6 +355,7 @@ class PredstaveController extends Controller
 
         if ($predstava->save()) {
             $predstava->pozorista()->sync($request->pozorista);
+            $predstava->zanrovi()->sync($request->zanrovi);
             return response()->json([], 200);
         }
     }
