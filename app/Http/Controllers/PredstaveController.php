@@ -175,6 +175,10 @@ class PredstaveController extends Controller
                 $q->orderBy('premijera', 'desc')->orderBy('naziv_predstave', 'asc');
                 break;
 
+            case 'komentari':
+                $q->orderBy('komentari_count', 'desc');
+                break;
+
             case 'name_asc':
             default:
                 $q->orderBy('naziv_predstave', 'asc');
