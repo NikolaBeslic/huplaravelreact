@@ -63,14 +63,18 @@ class AutoriController extends Controller
 
         $autor = new Autor($request->all());
 
+
+
         if ($request->file('slika')) {
             $fileExtension = $request->file('slika')->extension();
             $fileName = $request->autor_slug . '.' . $fileExtension;
             $path = $request->file('slika')->move(base_path() . '/react/public/slike/autori', $fileName);
             $autor->url_slike = '/slike/autori/' . $fileName;
+        } else {
+            $autor->url_slike = '/slike/hup-logo.jpg';
         }
         if ($autor->save())
-            return response()->json([], 200);
+            return response()->json();
     }
 
     public function update(Request $request)
