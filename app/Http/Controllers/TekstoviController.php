@@ -135,20 +135,18 @@ class TekstoviController extends Controller
 
     public function getSidebarPosts()
     {
-
-        $najnoviji = Tekst::where(['is_published' => 1, 'is_deleted' => 0])->with('kategorija')->orderBy('published_at', 'desc')->take(5)->get();
-        //$najcitaniji = $this->getNajcitanijeTekstove();
-        $najcitaniji = $najnoviji;
-        $result = $najcitaniji->union($najnoviji);
+        $result = new stdClass();
+        $result->najnoviji = Tekst::where(['is_published' => 1, 'is_deleted' => 0])->with('kategorija')->orderBy('published_at', 'desc')->take(5)->get();
+        $result->najcitaniji = $this->getNajcitanijeTekstove();
         return json_encode($result);
     }
 
     public function getNajcitanijeTekstove()
     {
-        $latestFetch = GaFetch::where('type_id', 6)->orderBy('updated_at', 'desc')->first();
-        $fetchDetails = GaFetchDetails::where('fetch_id', $latestFetch->fetch_id)->orderBy('views', 'desc')->take(7)->get();
-        $slugs = $fetchDetails->pluck('url');
-        $tekstovi = Tekst::whereIn('slug', $slugs)->get();
+        $tekstovi = Tekst::join('most_read', 'tekst.tekstid', '=', 'most_read.tekstid')
+            ->with('kategorija')
+            ->orderByDesc('most_read.views')
+            ->get();
         return $tekstovi;
     }
 

@@ -7,10 +7,12 @@ use AkkiIo\LaravelGoogleAnalytics\Period;
 use App\Models\GaFetch;
 use App\Models\GaFetchDetails;
 use App\Models\Kategorija;
+use App\Models\Tekst;
 use Carbon\CarbonPeriod;
 use Illuminate\Support\Carbon;
 use Google\Type\Month;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 
@@ -29,6 +31,38 @@ class GoogleAnalyticsController extends Controller
         return json_encode($fetchDetails);
     }
 
+    public function insertIntoMostRead()
+    {
+        $fetches = GaFetch::where('type_id', 6)->with(
+            [
+                'fetchDetails' => function ($query) {
+                    $query->orderBy('views', 'desc');
+                }
+            ]
+        )->orderBy('created_at', 'desc')->first()->toArray();
+
+        $fetchDetailsArr = $fetches['fetch_details'];
+        $brojac = 0;
+        $j = 0;
+        while ($brojac <= 5) {
+
+            $slug = $fetchDetailsArr[$j]['url'];
+            if (substr_count($slug, "/") == 2) {
+                $tekstSlug = ltrim(strrchr($slug, "/"), "/");
+                $tekstid = Tekst::where('slug', $tekstSlug)->value('tekstid');
+                if ($tekstid != null) {
+                    DB::table('most_read')->insert([
+                        'fetch_details_id' => $fetchDetailsArr[$j]['fetch_details_id'],
+                        'tekstid' => $tekstid,
+                        'views' => $fetchDetailsArr[$j]['views']
+                    ]);
+                    $brojac++;
+                }
+            }
+            $j++;
+        }
+    }
+
     public function getMonthlyData(Request $request)
     {
         $startDate = Carbon::create($request->query('year'), $request->query('month'), 1)->startOfMonth();
@@ -41,6 +75,8 @@ class GoogleAnalyticsController extends Controller
         $analyticsData = LaravelGoogleAnalytics::getMostViewsByPage($period, $count = 1000);
         $this->saveGoogleAnalyticsData($analyticsData, 5, $parameter, false);
         $this->saveGoogleAnalyticsData($analyticsData, 6, $parameter, true);
+
+        $this->insertIntoMostRead();
 
         $fetches = GaFetch::with('fetchType')->with('fetchDetails')->get();
         return json_encode($fetches);
