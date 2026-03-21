@@ -54,7 +54,7 @@ class TekstoviController extends Controller
         $predstaveResult = Predstava::select(
             DB::raw(
                 "'predstava' AS kategorija,
-                'predstava' AS kategorija_slug,
+                'predstave' AS kategorija_slug,
                 '#03532dff' AS boja,
                 MATCH(naziv_predstave, opis, uloge) AGAINST('" . $inputSearch . "' IN BOOLEAN MODE) as relevance",
             ),
