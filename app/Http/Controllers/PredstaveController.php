@@ -95,7 +95,9 @@ class PredstaveController extends Controller
             //->withAvg(['ocena as prosecna_ocena'], 'ocena')
             ->withAggregate(['ocena as prosecna_ocena'], 'ROUND(AVG(ocena), 1)')
             ->withCount(['ocena as broj_ocena'], 'korisnikid')
-            ->withCount(['komentari as broj_komentara', 'komentari']);
+            ->withCount(['komentari as broj_komentara' => function ($query) {
+                $query->where('statuskomentaraid', 2);
+            }]);
 
         $q->addSelect([
             'review_slug' => Tekst::query()
@@ -176,7 +178,7 @@ class PredstaveController extends Controller
                 break;
 
             case 'komentari':
-                $q->orderBy('komentari_count', 'desc');
+                $q->orderBy('broj_komentara', 'desc');
                 break;
 
             case 'name_asc':
