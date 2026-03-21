@@ -44,7 +44,7 @@ Route::get(
             event(new Verified($user));
         }
 
-        return redirect(env('FRONT_END_BASEURL') . '?verified=1');
+        return redirect(env('FRONT_END_BASEURL') . '/uspesna-verifikacija?verified=1');
     }
 )->middleware(['signed'])->name('verification.verify');
 
