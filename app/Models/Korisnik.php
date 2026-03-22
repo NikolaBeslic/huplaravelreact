@@ -42,7 +42,8 @@ class Korisnik extends Authenticatable implements MustVerifyEmail
                 'pozorista:pozoristeid,naziv_pozorista,skraceni_naziv',
                 'narednoIgranje'
             ])
-            ->with('zanrovi');
+            ->with('zanrovi')
+            ->orderBy('listazelja.updated_at', 'desc');;
     }
 
     public function listaOdgledanih()
@@ -60,7 +61,8 @@ class Korisnik extends Authenticatable implements MustVerifyEmail
             ->with([
                 'pozorista:pozoristeid,naziv_pozorista,pozoriste_slug,skraceni_naziv'
             ])
-            ->with('zanrovi');
+            ->with('zanrovi')
+            ->orderBy('listazelja.updated_at', 'desc');
     }
 
     public function ocena()
@@ -79,7 +81,8 @@ class Korisnik extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Komentar::class, 'korisnikid')
             ->select('komentarid', 'korisnikid', 'predstavaid', 'tekst_komentara', 'created_at')
-            ->with(['predstava:predstavaid,naziv_predstave,predstava_slug']);
+            ->with(['predstava:predstavaid,naziv_predstave,predstava_slug'])
+            ->orderByDesc('komentar.created_at');
     }
 
     public function sendEmailVerificationNotification()

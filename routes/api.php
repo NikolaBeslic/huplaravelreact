@@ -83,6 +83,9 @@ Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLink
 Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword']);
 Route::middleware(['auth:sanctum', 'verified'])->post('/logout', [AuthController::class, 'logout']);
 Route::middleware(['auth:sanctum', 'verified'])->get('/get-korisnicki-profil', [KorisniciController::class, 'getKorisnickiProfil']);
+Route::middleware(['auth:sanctum', 'verified'])->get('/korisnik/lista-zelja', [KorisniciController::class, 'getListaZelja']);
+Route::middleware(['auth:sanctum', 'verified'])->get('/korisnik/lista-odgledanih', [KorisniciController::class, 'getListaOdgledanih']);
+Route::middleware(['auth:sanctum', 'verified'])->get('/korisnik/komentari', [KorisniciController::class, 'getKorisnikKomentari']);
 Route::middleware(['auth:sanctum', 'verified'])->delete('/obrisi-sa-liste-zelja/{predstavaid}', [KorisniciController::class, 'obrisiSaListeZelja']);
 Route::middleware(['auth:sanctum', 'verified'])->post('/predstava/oceni', [PredstaveController::class, 'oceni']);
 Route::middleware(['auth:sanctum', 'verified'])->post('/predstava/dodajNaListuZelja', [PredstaveController::class, 'dodajNaListuZelja']);
