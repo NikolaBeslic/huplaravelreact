@@ -382,9 +382,21 @@ class PredstaveController extends Controller
         $ocena = new Ocena(['korisnikid' => $korisnik->id, 'predstavaid' => $predstava->predstavaid, 'ocena' => $request->ocena]);
         if ($ocena->save()) {
             $result = new stdClass();
+            // prebaci u odgledane
+            if (!$predstava->naListiOdgledanih()->where('korisnikid', $korisnik->id)->exists()) {
+                if ($predstava->naListiZelja()->where('korisnikid', $korisnik->id)->exists()) {
+                    $predstava->naListiZelja()->updateExistingPivot($korisnik, ['statuszeljeid' => 2]);
+                    $result->moved_to_watched = true;
+                } else {
+                    $predstava->naListiZelja()->attach($korisnik, ['statuszeljeid' => 2]);
+                    $result->moved_to_watched = true;
+                }
+            }
+
             $result->prosecnaOcena = round($predstava->ocena()->avg('ocena'), 1);
             $result->ocenaKorisnika = $this->getOcenaKorisnika($predstava);
             $result->brojOcena = $predstava->ocena->count();
+
             return response()->json($result);
         }
         return response()->json("Greska prilikom ocenjivanja", 500);
@@ -436,8 +448,20 @@ class PredstaveController extends Controller
             'tekst_komentara' => 'required|max:1000'
         ]);
         try {
-            $komentar->save();
-            return response()->json();
+            if ($komentar->save()) {
+                $result = new stdClass();
+                // prebaci u odgledane
+                if (!$predstava->naListiOdgledanih()->where('korisnikid', $korisnik->id)->exists()) {
+                    if ($predstava->naListiZelja()->where('korisnikid', $korisnik->id)->exists()) {
+                        $predstava->naListiZelja()->updateExistingPivot($korisnik, ['statuszeljeid' => 2]);
+                        $result->moved_to_watched = true;
+                    } else {
+                        $predstava->naListiZelja()->attach($korisnik, ['statuszeljeid' => 2]);
+                        $result->moved_to_watched = true;
+                    }
+                }
+            }
+            return response()->json($result);
         } catch (Exception $e) {
             return response()->json($e->getMessage(), 500);
         }
