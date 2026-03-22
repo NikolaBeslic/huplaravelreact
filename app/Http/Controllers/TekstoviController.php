@@ -208,81 +208,60 @@ class TekstoviController extends Controller
 
     public function getPosts()
     {
-        $intervjui = Tekst::select('tekstid', 'naslov', 'slug', 'uvod', 'tekst_photo', 'kategorijaid', 'na_slajderu', 'published_at')
-            ->with('kategorija')
-            ->with([
-                'predstave' => function ($query) {
-                    $query->select('naziv_predstave', 'predstava_slug');
-                }
+        $baseQuery = Tekst::query()
+            ->select([
+                'tekstid',
+                'naslov',
+                'slug',
+                'uvod',
+                'tekst_photo',
+                'kategorijaid',
+                'na_slajderu',
+                'published_at',
             ])
             ->with([
-                'autori' => function ($query) {
-                    $query->select('ime_autora', 'autor_slug', 'url_slike');
-                }
-            ])
+                'kategorija:kategorijaid,naziv_kategorije,kategorija_boja,kategorija_slug',
+                'autori:ime_autora,autor_slug,biografija,url_slike',
+            ]);
+
+        $intervjui = (clone $baseQuery)
             ->where('kategorijaid', 2)
-            ->orderBy('published_at', 'desc')
-            ->take(10);
-        $recenzije = Tekst::select('tekstid', 'naslov', 'slug', 'uvod', 'tekst_photo', 'kategorijaid', 'na_slajderu', 'published_at')
+            ->orderByDesc('published_at')
+            ->take(3)
+            ->get();
+
+        $recenzije = (clone $baseQuery)
+            ->with(['predstave:predstavaid,naziv_predstave,predstava_slug'])
             ->where('kategorijaid', 4)
-            ->with('kategorija')
-            ->with([
-                'predstave' => function ($query) {
-                    $query->select('naziv_predstave', 'predstava_slug');
-                }
-            ])
-            ->with([
-                'autori' => function ($query) {
-                    $query->select('ime_autora', 'autor_slug', 'url_slike');
-                }
-            ])
-            ->orderBy('published_at', 'desc')
-            ->take(10);
-        $vesti = Tekst::select('tekstid', 'naslov', 'slug', 'uvod', 'tekst_photo', 'kategorijaid', 'na_slajderu', 'published_at')
-            ->where('kategorijaid', 1)
-            ->with('kategorija')
-            ->with([
-                'predstave' => function ($query) {
-                    $query->select('naziv_predstave', 'predstava_slug');
-                }
-            ])
-            ->with([
-                'autori' => function ($query) {
-                    $query->select('ime_autora', 'autor_slug', 'url_slike');
-                }
-            ])
-            ->orderBy('published_at', 'desc')
-            ->take(10);
-        $naSlajderu  = Tekst::select('tekstid', 'naslov', 'slug', 'uvod', 'tekst_photo', 'kategorijaid', 'na_slajderu', 'published_at')
-            ->where('na_slajderu', 1)
-            ->with('kategorija')
-            ->with([
-                'predstave' => function ($query) {
-                    $query->select('naziv_predstave', 'predstava_slug');
-                }
-            ])
-            ->with([
-                'autori' => function ($query) {
-                    $query->select('ime_autora', 'autor_slug', 'url_slike');
-                }
-            ])
-            ->orderBy('published_at', 'desc')
-            ->take(5);
-        $hupkast = Tekst::select('tekstid', 'naslov', 'slug', 'uvod', 'tekst_photo', 'kategorijaid', 'na_slajderu', 'published_at')
+            ->orderByDesc('published_at')
+            ->take(3)
+            ->get();
+
+        $hupkast = (clone $baseQuery)
+            ->with('hupkast:hupkastid,tekstid,trajanje')
             ->where('kategorijaid', 11)
-            ->with('kategorija')
-            ->with([
-                'autori' => function ($query) {
-                    $query->select('ime_autora', 'autor_slug', 'url_slike');
-                }
-            ])
-            ->orderBy('published_at', 'desc')->take(3);
+            ->orderByDesc('published_at')
+            ->take(3)
+            ->get();
 
+        $najnovijiTekstovi = (clone $baseQuery)
+            ->orderByDesc('published_at')
+            ->take(6)
+            ->get();
 
-        $tekstovi = $intervjui->union($recenzije)->union($vesti)->union($naSlajderu)->orderBy('published_at', 'desc')->union($hupkast)->get();
-        // $result = TekstResource::collection($tekstovi);
+        $naSlajderu = (clone $baseQuery)
+            ->where('na_slajderu', 1)
+            ->orderByDesc('published_at')
+            ->get();
+
+        $tekstovi = new stdClass();
+        $tekstovi->na_slajderu = $naSlajderu;
+        $tekstovi->najnoviji = $najnovijiTekstovi;
+        $tekstovi->intervjui = $intervjui;
+        $tekstovi->recenzije = $recenzije;
+        $tekstovi->hupkast = $hupkast;
         $result = json_encode($tekstovi);
-        return $result;
+        return response($result);
     }
 
 
