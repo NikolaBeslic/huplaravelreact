@@ -698,7 +698,7 @@ class TekstoviController extends Controller
 
         $tekstovi = Tekst::select('tekstid', 'naslov', 'slug', 'uvod', 'tekst_photo', 'kategorijaid', 'published_at')
             ->where(['kategorijaid' => 11, 'is_published' => 1])
-            ->with(['kategorija'])
+            ->with(['kategorija', 'hupkast'])
             ->orderBy('published_at', 'desc')
             ->paginate(10);
         $hupkast->setRelation('tekstovi', $tekstovi);
