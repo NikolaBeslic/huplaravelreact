@@ -26,13 +26,9 @@ class KorisniciController extends Controller
     public function getListaZelja(Request $request)
     {
         $korisnik = Korisnik::findOrFail(auth('sanctum')->id());
-        $initialCount = 30; // First page load
-        $subsequentCount = 9; // Page 2 and beyond
 
-        $page = $request->get('page', 1);
-        $perPage = ($page == 1) ? $initialCount : $subsequentCount;
         $listaZelja = $korisnik->listaZelja()
-            ->paginate($perPage);
+            ->paginate(18);
 
         return response()->json($listaZelja);
     }
@@ -40,13 +36,8 @@ class KorisniciController extends Controller
     public function getListaOdgledanih(Request $request)
     {
         $korisnik = Korisnik::findOrFail(auth('sanctum')->id());
-        $initialCount = 20; // First page load
-        $subsequentCount = 10; // Page 2 and beyond
-
-        $page = $request->get('page', 1);
-        $perPage = ($page == 1) ? $initialCount : $subsequentCount;
         $listaOdgledanih = $korisnik->listaOdgledanih()
-            ->paginate($perPage);
+            ->paginate(15);
 
         return response()->json($listaOdgledanih);
     }
