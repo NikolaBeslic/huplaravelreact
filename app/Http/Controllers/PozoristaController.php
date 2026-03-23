@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Models\Pozoriste;
 use Dotenv\Exception\ValidationException;
 use Exception;
+use Illuminate\Support\Str;
 
 class PozoristaController extends Controller
 {
@@ -42,6 +43,11 @@ class PozoristaController extends Controller
         if (auth('sanctum')->user()) {
             $pozoriste->omiljenoKorisnika = $this->getOmiljenoKorisnika($pozoriste);
         }
+
+        $pozoriste->seo_title = $pozoriste->naziv_pozorista;
+        $pozoriste->seo_description = Str::limit(strip_tags($pozoriste->istorija_pozorista), 150, "...");
+        $pozoriste->seo_url = '/pozorista/' .  $pozoriste->pozoriste_slug;
+        $pozoriste->seo_image = $pozoriste->url_logo;
 
         return json_encode($pozoriste);
         // return $pozoriste;

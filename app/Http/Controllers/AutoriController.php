@@ -8,6 +8,7 @@ use App\Models\Tekst;
 use Dotenv\Exception\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class AutoriController extends Controller
 {
@@ -32,8 +33,13 @@ class AutoriController extends Controller
             ->orderBy('published_at', 'desc')
             ->paginate(12);
 
-
         $autor->setRelation('tekstovi', $tekstovi);
+
+        $autor->seo_title = $autor->ime_autora;
+        $autor->seo_description = Str::limit(strip_tags($autor->biografija), 150, "...");
+        $autor->seo_url = '/autori/' .  $autor->autor_slug;
+        $autor->seo_image = $autor->url_slike;
+
         return json_encode($autor);
     }
 

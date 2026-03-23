@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Festival;
 use Illuminate\Http\Request;
 use Dotenv\Exception\ValidationException;
+use Illuminate\Support\Str;
 
 class FestivaliController extends Controller
 {
@@ -29,6 +30,12 @@ class FestivaliController extends Controller
     {
         $festival = Festival::where('festival_slug', $festival_slug)->with('grad')->with('tekstovi.kategorija')
             ->firstOrFail();
+
+        $festival->seo_title = $festival->naziv_festivala;
+        $festival->seo_description = Str::limit(strip_tags($festival->tekst_festivala), 150, "...");
+        $festival->seo_url = '/festivali/' .  $festival->festival_slug;
+        $festival->seo_image = $festival->festival_slika;
+
         return json_encode($festival);
     }
 

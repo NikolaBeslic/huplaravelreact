@@ -299,6 +299,16 @@ class TekstoviController extends Controller
                 'hupkast.linkovi'
             ])
             ->firstOrFail();
+
+        $tekst->seo_title = $tekst->naslov;
+        if (!empty($tekst->uvod)) {
+            $tekst->seo_description = Str::limit(strip_tags($tekst->uvod), 150, "...");
+        } else {
+            $tekst->seo_description = Str::limit(strip_tags($tekst->sadrzaj), 150, "...");
+        }
+        $tekst->seo_url = '/' . $tekst->kategorija->kategorija_slug . '/' . $tekst->slug;
+        $tekst->seo_image = $tekst->tekst_photo;
+
         //return TekstResource::make($tekst);
         return json_encode($tekst);
     }
@@ -688,6 +698,16 @@ class TekstoviController extends Controller
     {
         $hupkast = Tekst::where('slug', $hupkast_slug)->where('is_published', 1)->with('hupkast.linkovi')->with('autori')->firstOrFail();
         $hupkast->relatedHupkasts = $this->getRelatedHupkasts($hupkast->tekstid);
+
+        $hupkast->seo_title = $hupkast->naslov;
+        if (!empty($hupkast->uvod)) {
+            $hupkast->seo_description = Str::limit(strip_tags($hupkast->uvod), 150, "...");
+        } else {
+            $hupkast->seo_description = Str::limit(strip_tags($hupkast->sadrzaj), 150, "...");
+        }
+        $hupkast->seo_url = '/' . $hupkast->kategorija->kategorija_slug . '/' . $hupkast->slug;
+        $hupkast->seo_image = $hupkast->tekst_photo;
+
         return json_encode($hupkast);
     }
 

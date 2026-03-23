@@ -15,6 +15,7 @@ use Dotenv\Exception\ValidationException;
 use Exception;
 use stdClass;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class PredstaveController extends Controller
 {
@@ -70,6 +71,11 @@ class PredstaveController extends Controller
                 $predstava->naListiZeljaKorisnika = true;
             }
         }
+
+        $predstava->seo_title = $predstava->naziv_predstave;
+        $predstava->seo_description = Str::limit(strip_tags($predstava->opis), 150, "...");
+        $predstava->seo_url = '/predstave/' . $predstava->predstava_slug;
+        $predstava->seo_image = $predstava->plakat;
 
         return response()->json($predstava);
         //return PredstavaResource::make($predstava);
