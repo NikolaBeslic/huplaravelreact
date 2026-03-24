@@ -28,10 +28,22 @@ class PozoristaController extends Controller
 
     public function getSinglePozoriste($pozoriste_slug)
     {
+        $today = now()->toDateString();
+        $timeNow = now()->format('H:i:s');
+
         $pozoriste = Pozoriste::where('pozoriste_slug', $pozoriste_slug)
-            ->with(['igranja.predstava' => function ($query) {
-                $query->select('predstavaid', 'naziv_predstave', 'predstava_slug', 'plakat'); // Specify the columns you want to load
-                // }])->with(['tekstovi.kategorija'])
+            ->with(['igranja' => function ($query) use ($today, $timeNow) {
+                $query->where(function ($q) use ($today, $timeNow) {
+                    $q->whereDate('datum', '>', $today)
+                        ->orWhere(function ($q2) use ($today, $timeNow) {
+                            $q2->whereDate('datum', $today)
+                                ->where('vreme', '>=', $timeNow);
+                        });
+                })
+                    ->orderBy('datum')
+                    ->orderBy('vreme');
+            }, 'igranja.predstava' => function ($query) {
+                $query->select('predstavaid', 'naziv_predstave', 'predstava_slug', 'plakat');
             }])->with(['tekstovi' => function ($query) {
                 $query->select('tekst.tekstid', 'naslov', 'slug', 'tekst_photo', 'published_at', 'created_at', 'kategorijaid'); // Specify the columns you want to load
             }, 'tekstovi.kategorija'])
@@ -40,7 +52,7 @@ class PozoristaController extends Controller
             }, 'predstave.zanrovi'])
             ->firstOrFail();
 
-        if (auth('sanctum')->user()) {
+        if (auth('sanctum')->user() != null) {
             $pozoriste->omiljenoKorisnika = $this->getOmiljenoKorisnika($pozoriste);
         }
 
