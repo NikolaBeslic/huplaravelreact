@@ -273,10 +273,19 @@ class TekstoviController extends Controller
         $tekstovi = Tekst::select('naslov', 'slug', 'sadrzaj', 'tekst_photo', 'created_at', 'published_at', 'uvod', 'kategorijaid')
             ->whereIn('kategorijaid', $katIds)
             ->where('is_published', 1)
-            ->with('kategorija:kategorijaid,naziv_kategorije,kategorija_boja,kategorija_slug')
+            ->with('kategorija:kategorijaid,naziv_kategorije,kategorija_boja,kategorija_slug,kategorija_opis')
             ->orderBy('published_at', 'desc')
             ->paginate(12);
         $kategorija->setRelation('tekstovi', $tekstovi);
+
+        $kategorija->seo_title = $kategorija->display_naziv_kategorije;
+        if (empty($kategorija->kategorija_opis)) {
+            $kategorija->seo_description = "";
+        } else {
+            $kategorija->seo_description = Str::limit(strip_tags($kategorija->kategorija_opis), 150, "...");
+        }
+        $kategorija->seo_url = '/' . $kategorija->kategorija_slug;
+
         return json_encode($kategorija);
         // $result = KategorijaResource::make($kategorija);
         // return $result;
@@ -691,6 +700,15 @@ class TekstoviController extends Controller
             ->orderBy('published_at', 'desc')
             ->paginate(10);
         $hupkast->setRelation('tekstovi', $tekstovi);
+
+        $hupkast->seo_title = $hupkast->display_naziv_kategorije;
+        if (empty($hupkast->kategorija_opis)) {
+            $hupkast->seo_description = "";
+        } else {
+            $hupkast->seo_description = Str::limit(strip_tags($hupkast->kategorija_opis), 150, "...");
+        }
+        $hupkast->seo_url = '/' . $hupkast->kategorija_slug;
+
         return json_encode($hupkast);
     }
 
@@ -738,6 +756,14 @@ class TekstoviController extends Controller
                     ->paginate(12);
             }])
             ->firstOrFail();
+
+        $hupikon->seo_title = $hupikon->display_naziv_kategorije;
+        if (empty($hupikon->kategorija_opis)) {
+            $hupikon->seo_description = "";
+        } else {
+            $hupikon->seo_description = Str::limit(strip_tags($hupikon->kategorija_opis), 150, "...");
+        }
+        $hupikon->seo_url = '/' . $hupikon->kategorija_slug;
         return json_encode($hupikon);
     }
 
