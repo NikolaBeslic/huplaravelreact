@@ -52,6 +52,13 @@ class KorisniciController extends Controller
         return response()->json($komentari);
     }
 
+    public function getKorisnikOmiljenaPozorista(Request $request)
+    {
+        $korisnik = Korisnik::findOrFail(auth('sanctum')->id());
+        $omiljenaPozorista = $korisnik->omiljenaPozorista()->paginate(10);
+        return response()->json($omiljenaPozorista);
+    }
+
     public function obrisiSaListeZelja(Request $request)
     {
         $predstava = Predstava::where('predstavaid', $request->predstavaid)
