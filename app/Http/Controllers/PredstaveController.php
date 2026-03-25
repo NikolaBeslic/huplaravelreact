@@ -300,7 +300,7 @@ class PredstaveController extends Controller
 
     public function getAllPredstaveAdmin()
     {
-        $predstave = Predstava::select('predstavaid', 'naziv_predstave', 'predstava_slug', 'premijera', 'created_at')
+        $predstave = Predstava::select('predstavaid', 'naziv_predstave', 'predstava_slug', 'premijera', 'u_arhivi', 'created_at')
             ->with([
                 'pozorista' => function ($query) {
                     $query->select('pozoriste.pozoristeid', 'pozoriste_slug', 'naziv_pozorista');
@@ -471,6 +471,16 @@ class PredstaveController extends Controller
         } catch (Exception $e) {
             return response()->json($e->getMessage(), 500);
         }
+    }
+
+    public function arhiviraj(Request $request)
+    {
+        $predstava = Predstava::where('predstavaid', $request->predstavaid)->firstOrFail();
+        $predstava->u_arhivi = 1;
+        if ($predstava->save()) {
+            return response()->json(['u_arhivi' => $predstava->u_arhivi], 200);
+        }
+        return response("Neka greska", 500);
     }
 
     private function csvOrArrayToInts($value): array

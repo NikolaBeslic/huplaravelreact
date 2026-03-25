@@ -12,7 +12,7 @@ class Predstava extends Model
     protected $primaryKey = 'predstavaid';
 
     protected $guarded = ['created_at', 'published_at'];
-    protected $fillable = ['naziv_predstave', 'predstava_slug', 'premijera', 'autor', 'reditelj', 'uloge', 'opis', 'plakat', 'updated_at', 'created_at'];
+    protected $fillable = ['naziv_predstave', 'predstava_slug', 'premijera', 'autor', 'reditelj', 'uloge', 'opis', 'plakat', 'u_arhivi', 'updated_at', 'created_at'];
 
     public function pozorista()
     {

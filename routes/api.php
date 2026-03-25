@@ -150,6 +150,7 @@ Route::middleware('auth:admin')
             Route::get('/admin/get-single-predstava/{predstavaid}', [PredstaveController::class, 'getSinglePredstavaById']);
             Route::post('/admin/create-predstava', [PredstaveController::class, 'store']);
             Route::post('/admin/update-predstava', [PredstaveController::class, 'update']);
+            Route::post('/admin/predstave/arhiviraj', [PredstaveController::class, 'arhiviraj']);
 
             /* Admin HuPkast */
             Route::get('/admin/check-hupkast-rss', [HuPkastController::class, 'checkHuPkastRSS']);
