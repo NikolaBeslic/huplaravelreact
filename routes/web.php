@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\GoogleAnalyticsController;
 use App\Http\Controllers\GoogleController;
+use App\Http\Controllers\SitemapController;
 use App\Models\Korisnik;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -67,3 +68,5 @@ Route::get('/test-mail', function () {
 
     return 'Email sent';
 });
+
+Route::get('/sitemap.xml', [SitemapController::class, 'index']);
