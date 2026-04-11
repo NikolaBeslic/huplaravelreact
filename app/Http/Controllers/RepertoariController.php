@@ -248,7 +248,7 @@ class RepertoariController extends Controller
             }])
             ->with('scena')
             ->orderBy('seigraid', 'desc')
-            ->take(50)
+            ->take(100)
             ->get();
         return $igranja;
     }

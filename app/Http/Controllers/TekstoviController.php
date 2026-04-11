@@ -5,10 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Tag;
 use App\Models\Autor;
 use App\Models\Festival;
-use App\Http\Resources\KategorijaResource;
-use App\Http\Resources\TekstResource;
-use App\Models\GaFetch;
-use App\Models\GaFetchDetails;
 use App\Models\Kategorija;
 use App\Models\Pozoriste;
 use App\Models\Tekst;
@@ -20,8 +16,6 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException as ValidationValidationException;
-use JsonSerializable;
 use stdClass;
 
 class TekstoviController extends Controller
@@ -442,12 +436,25 @@ class TekstoviController extends Controller
         $hupikon->save();
     }
 
-    public function adminindex()
+    public function adminindex(Request $request)
     {
-        $tekstovi = Tekst::select('tekstid', 'naslov', 'slug', 'kategorijaid', 'is_published', 'is_deleted', 'na_slajderu', 'created_at', 'published_at')
-            ->with('kategorija')
-            ->orderBy('published_at', 'desc')
-            ->get();
+        if ($request->kategorija != null) {
+            $kategorija = Kategorija::where('kategorija_slug', $request->kategorija)->firstOrFail();
+            $tekstovi = Tekst::select('tekstid', 'naslov', 'slug', 'kategorijaid', 'is_published', 'is_deleted', 'na_slajderu', 'created_at', 'published_at')
+                ->with('kategorija')
+                ->where([
+                    'kategorijaid' => $kategorija->kategorijaid,
+                    'is_deleted' => 0
+                ])
+                ->orderBy('published_at', 'desc')
+                ->get();
+        } else {
+            $tekstovi = Tekst::select('tekstid', 'naslov', 'slug', 'kategorijaid', 'is_published', 'is_deleted', 'na_slajderu', 'created_at', 'published_at')
+                ->with('kategorija')
+                ->where('is_deleted', 0)
+                ->orderBy('published_at', 'desc')
+                ->get();
+        }
 
         return json_encode($tekstovi);
     }
@@ -618,6 +625,17 @@ class TekstoviController extends Controller
         }
     }
 
+    public function delete(Request $request)
+    {
+        $tekst = Tekst::where('tekstid', $request->tekstid)->firstOrFail();
+        $tekst->is_deleted = 1;
+        if ($tekst->save()) {
+            return response()->json("", 200);
+        } else {
+            return response()->json("Greška prilikom brisanja", 500);
+        }
+    }
+
     /**
      * Remove the specified resource from storage.
      *
@@ -773,7 +791,13 @@ class TekstoviController extends Controller
 
     public function adminGetTekstoviZaNaslovnu()
     {
-        $tekstovi = Tekst::select('tekstid', 'naslov', 'slug', 'tekst_photo', 'kategorijaid', 'na_slajderu', 'published_at')->orderBy('na_slajderu', 'desc')->orderBy('published_at', 'desc')->take(10)->get();
+        $tekstovi = Tekst::select('tekstid', 'naslov', 'slug', 'tekst_photo', 'kategorijaid', 'na_slajderu', 'published_at')
+            ->with('kategorija')
+            ->where(['is_deleted' => 0])
+            ->orderBy('na_slajderu', 'desc')
+            ->orderBy('published_at', 'desc')
+            ->take(10)
+            ->get();
         $result = $tekstovi->sortByDesc('published_at')->values();
         return json_encode($result);
     }

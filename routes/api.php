@@ -78,7 +78,7 @@ Route::get('get-all-tagovi', [TagoviController::class, 'getAllTagovi']);
 Route::get('/get-texts-by-tag/{tag_slug}', [TagoviController::class, 'getTekstsByTag']);
 
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:20,1');
+Route::middleware('web')->post('/login', [AuthController::class, 'login'])->middleware('throttle:20,1');
 Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLink']);
 Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword']);
 Route::middleware(['auth:sanctum', 'verified'])->post('/logout', [AuthController::class, 'logout']);
@@ -120,6 +120,8 @@ Route::middleware('auth:admin')
             Route::get('/admin/get-all-combobox-data', [TekstoviController::class, 'getAllComboboxData']);
             Route::post('/admin/update-tekst', [TekstoviController::class, 'update2']);
             Route::post('/admin/create-tekst', [TekstoviController::class, 'store2']);
+            Route::put('/admin/delete-tekst', [TekstoviController::class, 'delete']);
+
             /* Admin kategorije */
             Route::get('/admin/kategorije', [KategorijeController::class, 'adminindex']);
             Route::get('/admin/get-single-kategorija/{kategorijaid}', [KategorijeController::class, 'getSingleKategorija']);
@@ -182,7 +184,7 @@ Route::middleware('auth:admin')
 
             /* Admin Komentari */
             Route::get("/admin/get-all-komentari", [KomentariController::class, 'getAllKomentari']);
-            Route::post('/admin/odobri-komentar/', [KomentariController::class, 'odobriKomentar']);
+            Route::post('/admin/odobri-komentar', [KomentariController::class, 'odobriKomentar']);
             Route::delete('/admin/komentar-delete/{komentarid}', [KomentariController::class, 'deleteKomentar']);
 
             /* Google Analytics */

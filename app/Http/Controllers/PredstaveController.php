@@ -282,7 +282,7 @@ class PredstaveController extends Controller
         $premijere = Predstava::select('predstavaid', 'naziv_predstave', 'predstava_slug', 'premijera', 'plakat')
             ->with('pozorista:pozoristeid,pozoriste_slug,naziv_pozorista')
             ->whereDate('premijera', '>=', Carbon::today()->toDateString())
-            ->orderBy('premijera', 'desc')
+            ->orderBy('premijera', 'asc')
             ->take(5)
             ->get();
         return json_encode($premijere);
@@ -313,7 +313,7 @@ class PredstaveController extends Controller
 
     public function getSinglePredstavaById($predstavaid)
     {
-        $predstava = Predstava::where('predstavaid', $predstavaid)->with('pozorista')->with('zanrovi')->firstOrFail();
+        $predstava = Predstava::where('predstavaid', $predstavaid)->with('pozorista:pozoristeid,naziv_pozorista')->with('zanrovi:zanrid,naziv_zanra')->firstOrFail();
         return json_encode($predstava);
     }
 
